@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import userModel from "../../DB/model/User.js";
+import userModel from "../../DB/model/User.model.js";
 
 
 
