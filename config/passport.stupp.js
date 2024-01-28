@@ -1,11 +1,11 @@
 import passport from "passport";
 import GoogleStrategy from "passport-google-oauth20";
-import path from 'path'
-import { fileURLToPath } from 'url'
+import path from "path";
+import { fileURLToPath } from "url";
 import dotenv from "dotenv";
-//set directory dirname 
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
-dotenv.config({ path: path.join(__dirname, './.env') })
+//set directory dirname
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.join(__dirname, "./.env") });
 import userModel from "../DB/model/User.model.js";
 passport.serializeUser((user, done) => {
   done(null, user._id);
@@ -18,13 +18,16 @@ passport.deserializeUser(async (id, done) => {
 passport.use(
   new GoogleStrategy(
     {
-      callbackURL: "https://backend-developer-xi.vercel.app/auth/google/redirect",
+      callbackURL:
+        "https://backend-developer-xi.vercel.app/auth/google/redirect",
       clientID: process.env.CLIENTID,
       clientSecret: process.env.CLIENTSECRET,
       scope: ["profile", "email"],
     },
     async (accessToken, refreshToken, profile, done) => {
-      const checkUser = await userModel.findOne({ googleId: profile.id });
+      const checkUser = await userModel.findOne({
+        $or: [{ googleId: profile.id }, { email: profile._json.email }],
+      });
       if (checkUser) {
         done(null, checkUser);
       } else {
