@@ -1,6 +1,6 @@
 import { Router } from "express";
 import * as Validators from "./auth.validation.js";
-import {validation} from "../../middleware/validation.js";
+import { validation } from "../../middleware/validation.js";
 import auth from "../../middleware/auth.js";
 import * as userController from "./controller/auth.js";
 import passport from "passport";
@@ -16,6 +16,7 @@ router.get("/login/failed", (req, res, next) => {
 router.get("/login/success", async (req, res, next) => {
   if (req.user) {
     req.user.status = "online";
+    req.user.isConfirmed = true;
     await req.user.save();
     return res
       .status(200)
@@ -31,8 +32,10 @@ router.get("/logout", (req, res, next) => {
 router.get(
   "/google/redirect",
   passport.authenticate("google", {
-    successRedirect: "https://backend-developer-xi.vercel.app/auth/login/success",
-    failureRedirect: "https://backend-developer-xi.vercel.app/auth/login/failed",
+    successRedirect:
+      "https://backend-developer-xi.vercel.app/auth/login/success",
+    failureRedirect:
+      "https://backend-developer-xi.vercel.app/auth/login/failed",
   })
 );
 router.post(
