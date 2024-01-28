@@ -1,51 +1,73 @@
-import { Schema, model } from "mongoose";
+import mongoose, { Schema, Types, model } from "mongoose";
 
-
-const userSchema = new Schema({
-
+const userSchema = new Schema(
+  {
     userName: {
-        type: String,
-        required: [true, 'userName is required'],
-        min: [2, 'minimum length 2 char'],
-        max: [20, 'max length 2 char']
-
+      type: String,
+      required: true,
+      min: 3,
+      max: 20,
     },
+    googleId: String,
     email: {
-        type: String,
-        unique: [true, 'email must be unique value'],
-        required: [true, 'userName is required'],
+      type: String,
+      unique: true,
+      required: true,
+      lowercase: true,
     },
     password: {
-        type: String,
-        required: [true, 'password is required'],
+      type: String,
     },
-    phone: {
-        type: String,
+    gender: {
+      type: String,
+      enum: ["male", "female"],
+    },
+    phone: String,
+    status: {
+      type: String,
+      enum: ["online", "offline"],
+      default: "offline",
     },
     role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user",
+      required: true,
+    },
+    wishlist: [Types.ObjectId],
+    isConfirmed: {
+      type: Boolean,
+      default: false,
+    },
+    forgetCode: String,
+    activationCode: String,
+    profileImage: {
+      url: {
         type: String,
-        default: 'User',
-        enum: ['User', 'Admin']
+        default:
+          "https://res.cloudinary.com/dz5dpvxg7/image/upload/v1691521498/ecommerceDefaults/user/png-clipart-user-profile-facebook-passport-miscellaneous-silhouette_aol7vc.png",
+      },
+      id: {
+        type: String,
+        default:
+          "ecommerceDefaults/user/png-clipart-user-profile-facebook-passport-miscellaneous-silhouette_aol7vc",
+      },
     },
+    coverImages: [
+      {
+        url: {
+          type: String,
+          required: true,
+        },
+        id: {
+          type: String,
+          required: true,
+        },
+      },
+    ],
+  },
+  { timestamps: true }
+);
 
-    active: {
-        type: Boolean,
-        default: false,
-    },
-    confirmEmail: {
-        type: Boolean,
-        default: false,
-    },
-    blocked: {
-        type: Boolean,
-        default: false,
-    },
-    image: String,
-    DOB: String,
-}, {
-    timestamps: true
-})
-
-
-const userModel = model('User', userSchema)
-export default userModel
+const userModel = mongoose.models.userModel || model("User", userSchema);
+export default userModel;
