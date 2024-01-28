@@ -4,9 +4,15 @@ export const registerSchema = joi
   .object({
     userName: joi.string().min(3).max(20).required(),
     email: joi.string().email().required(),
-    password: joi.string().required(),
-    role: joi.string().valid("admin", "user").required(),
-    confirmPassword: joi.string().valid(joi.ref("password")).required(),
+    password: joi
+      .string()
+      .regex(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/)
+      .required(),
+    confirmPassword: joi
+      .string()
+      .regex(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/)
+      .valid(joi.ref("password"))
+      .required(),
   })
   .required();
 
@@ -19,7 +25,10 @@ export const activateSchema = joi
 export const login = joi
   .object({
     email: joi.string().email().required(),
-    password: joi.string().required(),
+    password: joi
+      .string()
+      .regex(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/)
+      .required(),
   })
   .required();
 
@@ -36,8 +45,14 @@ export const verify = joi
 
 export const resetPassword = joi
   .object({
-    email: joi.string().email().required(),
-    password: joi.string().required(),
-    confirmPassword: joi.string().valid(joi.ref("password")).required(),
+    password: joi
+      .string()
+      .regex(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/)
+      .required(),
+    confirmPassword: joi
+      .string()
+      .regex(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/)
+      .valid(joi.ref("password"))
+      .required(),
   })
   .required();

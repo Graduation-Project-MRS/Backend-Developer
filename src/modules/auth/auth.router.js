@@ -1,6 +1,6 @@
 import { Router } from "express";
 import * as Validators from "./auth.validation.js";
-import { isValidation } from "../../middleware/validation.js";
+import {validation} from "../../middleware/validation.js";
 import auth from "../../middleware/auth.js";
 import * as userController from "./controller/auth.js";
 import passport from "passport";
@@ -31,40 +31,41 @@ router.get("/logout", (req, res, next) => {
 router.get(
   "/google/redirect",
   passport.authenticate("google", {
-    successRedirect: "http://backend-kappa-beige.vercel.app/auth/login/success",
-    failureRedirect: "http://backend-kappa-beige.vercel.app/auth/login/failed",
+    successRedirect: "http://localhost:3000/auth/login/success",
+    failureRedirect: "http://localhost:3000/auth/login/failed",
   })
 );
 router.post(
   "/register",
-  isValidation(Validators.registerSchema),
+  validation(Validators.registerSchema),
   userController.register
 );
 
 router.get(
   "/confirmEmail/:activationCode",
-  isValidation(Validators.activateSchema),
+  validation(Validators.activateSchema),
   userController.activationAccount
 );
 
-router.post("/login", isValidation(Validators.login), userController.login);
+router.post("/login", validation(Validators.login), userController.login);
 
 //send forget password
 
 router.patch(
   "/forgetCode",
-  isValidation(Validators.forgetCode),
+  validation(Validators.forgetCode),
   userController.sendForgetCode
 );
 router.patch(
   "/VerifyCode",
   auth,
-  isValidation(Validators.verify),
-  userController.verifyCode
+  validation(Validators.verify),
+  userController.VerifyCode
 );
 router.patch(
   "/resetPassword",
-  isValidation(Validators.resetPassword),
+  auth,
+  validation(Validators.resetPassword),
   userController.resetPasswordByCode
 );
 export default router;

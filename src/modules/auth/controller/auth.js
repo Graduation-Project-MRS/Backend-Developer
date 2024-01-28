@@ -1,16 +1,15 @@
-import userModel from "../../../../DB/models/user.model.js";
-import { asyncHandler } from "../../../utils/asyncHandler.js";
+import { asyncHandler } from "../../../utils/errorHandling.js";
 import bcryptjs from "bcryptjs";
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
-import { sendEmail } from "../../../utils/sendEmails.js";
+import sendEmail from "../../../utils/email.js";
 import { resetPassword, signupTemp } from "../../../utils/generateHtml.js";
-import tokenModel from "../../../../DB/models/token.model.js";
+import tokenModel from "../../../../DB/model/Token.model.js";
 import randomstring from "randomstring";
-import cartModel from "../../../../DB/models/cart.model.js";
+import userModel from "../../../../DB/model/User.model.js";
 
 export const register = asyncHandler(async (req, res, next) => {
-  const { userName, email, password, role } = req.body;
+  const { userName, email, password } = req.body;
   const isUser = await userModel.findOne({ email });
   if (isUser) {
     return next(new Error("email already registered !", { cause: 409 }));
@@ -26,11 +25,10 @@ export const register = asyncHandler(async (req, res, next) => {
     userName,
     email,
     password: hashPassword,
-    role,
     activationCode,
   });
 
-  const link = `https://backend-kappa-beige.vercel.app/auth/confirmEmail/${activationCode}`;
+  const link = `http://localhost:3000/auth/confirmEmail/${activationCode}`;
 
   const isSent = await sendEmail({
     to: email,
@@ -43,7 +41,6 @@ export const register = asyncHandler(async (req, res, next) => {
         .json({ success: true, message: "Please review Your email!" })
     : next(new Error("something went wrong!", { cause: 400 }));
 });
-
 export const activationAccount = asyncHandler(async (req, res, next) => {
   const user = await userModel.findOneAndUpdate(
     { activationCode: req.params.activationCode },
@@ -53,9 +50,7 @@ export const activationAccount = asyncHandler(async (req, res, next) => {
   if (!user) {
     return next(new Error("User Not Found!", { cause: 404 }));
   }
-  if (user.role == "user") {
-    await cartModel.create({ user: user._id });
-  }
+
   return res
     .status(200)
     .send("Congratulation, Your Account is now activated, try to login");
@@ -81,7 +76,7 @@ export const login = asyncHandler(async (req, res, next) => {
 
   const token = jwt.sign(
     { id: user._id, email: user.email },
-    process.env.TOKEN_KEY,
+    process.env.TOKEN_SIGNATURE,
     { expiresIn: "2d" }
   );
 
@@ -145,10 +140,14 @@ export const resetPasswordByCode = asyncHandler(async (req, res, next) => {
 });
 
 export const VerifyCode = asyncHandler(async (req, res, next) => {
-  if (req.user.forgetCode !== req.body.forgetCode) {
+  const user = await userModel.findOne({ email: req.user.email });
+  if(!user.forgetCode){
+    return next(new Error("go to resend forget code", { status: 400 }));
+  }
+  if (user.forgetCode !== req.body.forgetCode) {
     return next(new Error("Invalid code!", { status: 400 }));
   }
-  const user = await userModel.findOneAndUpdate(
+  await userModel.findOneAndUpdate(
     { email: req.user.email },
     { $unset: { forgetCode: 1 } }
   );
