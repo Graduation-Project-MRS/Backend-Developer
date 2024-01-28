@@ -31,8 +31,8 @@ router.get("/logout", (req, res, next) => {
 router.get(
   "/google/redirect",
   passport.authenticate("google", {
-    successRedirect: "http://localhost:3000/auth/login/success",
-    failureRedirect: "http://localhost:3000/auth/login/failed",
+    successRedirect: "https://backend-developer-xi.vercel.app/auth/login/success",
+    failureRedirect: "https://backend-developer-xi.vercel.app/auth/login/failed",
   })
 );
 router.post(
