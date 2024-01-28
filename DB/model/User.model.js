@@ -45,12 +45,12 @@ const userSchema = new Schema(
       url: {
         type: String,
         default:
-          "https://res.cloudinary.com/dz5dpvxg7/image/upload/v1691521498/ecommerceDefaults/user/png-clipart-user-profile-facebook-passport-miscellaneous-silhouette_aol7vc.png",
+          "https://res.cloudinary.com/dz5dpvxg7/image/upload/v1706484939/fast-plate/Screenshot_2022-09-10_040814_vhfktx.png",
       },
       id: {
         type: String,
         default:
-          "ecommerceDefaults/user/png-clipart-user-profile-facebook-passport-miscellaneous-silhouette_aol7vc",
+          "fast-plate/Screenshot_2022-09-10_040814_vhfktx.png",
       },
     },
     coverImages: [
