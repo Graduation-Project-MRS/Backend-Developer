@@ -151,8 +151,11 @@ export const VerifyCode = asyncHandler(async (req, res, next) => {
     { email: req.user.email },
     { $unset: { forgetCode: 1 } }
   );
-
+  const token = jwt.sign(
+    { id: user._id, email: user.email },
+    process.env.TOKEN_SIGNATURE,
+  );
   return res
     .status(200)
-    .json({ success: true, message: "go to reset new password" });
+    .json({ success: true, message: "go to reset new password" ,token});
 });
