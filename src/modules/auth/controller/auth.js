@@ -108,13 +108,17 @@ export const sendForgetCode = asyncHandler(async (req, res, next) => {
 
   user.forgetCode = code;
   await user.save();
+  const token = jwt.sign(
+    { id: user._id, email: user.email },
+    process.env.TOKEN_SIGNATURE,
+  );
 
   return (await sendEmail({
     to: user.email,
     subject: "Reset Password",
     html: resetPassword(code),
   }))
-    ? res.status(200).json({ success: true, message: "check you email!" })
+    ? res.status(200).json({ success: true, message: "check you email!",token })
     : next(new Error("Something went wrong!", { cause: 400 }));
 });
 
@@ -151,11 +155,8 @@ export const VerifyCode = asyncHandler(async (req, res, next) => {
     { email: req.user.email },
     { $unset: { forgetCode: 1 } }
   );
-  const token = jwt.sign(
-    { id: user._id, email: user.email },
-    process.env.TOKEN_SIGNATURE,
-  );
+  
   return res
     .status(200)
-    .json({ success: true, message: "go to reset new password" ,token});
+    .json({ success: true, message: "go to reset new password" });
 });
