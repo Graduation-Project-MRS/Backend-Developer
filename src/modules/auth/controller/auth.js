@@ -112,7 +112,11 @@ export const sendForgetCode = asyncHandler(async (req, res, next) => {
     { id: user._id, email: user.email },
     process.env.TOKEN_SIGNATURE,
   );
-
+  await tokenModel.create({
+    token,
+    user: user._id,
+    agent: req.headers["user-agent"],
+  });
   return (await sendEmail({
     to: user.email,
     subject: "Reset Password",
