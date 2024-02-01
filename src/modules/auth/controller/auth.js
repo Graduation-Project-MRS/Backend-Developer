@@ -28,7 +28,7 @@ export const register = asyncHandler(async (req, res, next) => {
     activationCode,
   });
 
-  const link = `https://backend-developer-xi.vercel.app/auth/confirmEmail/${activationCode}`;
+  const link = `https://fast-plate.vercel.app/auth/confirmEmail/${activationCode}`;
 
   const isSent = await sendEmail({
     to: email,

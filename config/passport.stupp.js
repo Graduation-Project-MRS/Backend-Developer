@@ -19,7 +19,7 @@ passport.use(
   new GoogleStrategy(
     {
       callbackURL:
-        "https://backend-developer-xi.vercel.app/auth/google/redirect",
+        "https://fast-plate.vercel.app/auth/google/redirect",
       clientID: process.env.CLIENTID,
       clientSecret: process.env.CLIENTSECRET,
       scope: ["profile", "email"],
