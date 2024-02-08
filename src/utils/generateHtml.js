@@ -9,16 +9,6 @@ export const signupTemp = (link) => `<!DOCTYPE html>
         background-color: #88BDBF;
         margin: 0px;
     }
-
-    @media (max-width:500px) {
-        h1 {
-            font-size: 1rem !important;
-        }
-
-        a {
-            font-size: .8rem !important;
-        }
-    }
 </style>
 
 <body style="margin:0px;">
@@ -148,20 +138,6 @@ export const resetPassword = (code) => `<!DOCTYPE html>
                 font-style: italic;
                 font-weight: 700;
                 src: local('Lato Bold Italic'), local('Lato-BoldItalic'), url(https://fonts.gstatic.com/s/lato/v11/HkF_qI1x_noxlxhrhMQYELO3LdcAZYWl9Si6vvxL-qU.woff) format('woff');
-            }
-        }
-
-        @media (max-width:460px) {
-            table td {
-                padding: 5px !important;
-            }
-
-            p {
-                font-size: .9rem !important;
-            }
-
-            h2 {
-                font-size: 1rem !important;
             }
         }
 
