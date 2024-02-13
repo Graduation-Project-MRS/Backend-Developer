@@ -38,7 +38,7 @@ export const signupTemp = (link) => `<!DOCTYPE html>
                     <tr>
                         <td style="background-color:#049601;height:100px;font-size:50px;color:#fff;">
                             <img width="250px" height="250px"
-                                src="https://png2.cleanpng.com/sh/6c7f27acbba246b243361fba136f2374/L0KzQoW3UcEzN5xBjpH9cnHxg8HokvVvfF51eeJucj3kecP3jPFvbV47TdM5ZnLlRYnrgsI4PF88TqYDOUa2SIKAUMUxPGo1SaUAOEC3PsH1h5==/transparent-paper-airplane-65a0fbb58db274.7648963817050490135804.png">
+                                src="https://res.cloudinary.com/dgzucjqgi/image/upload/v1707833029/photo_2024-02-13_16-03-05_vlatjd.jpg">
                         </td>
                     </tr>
                     <tr>
