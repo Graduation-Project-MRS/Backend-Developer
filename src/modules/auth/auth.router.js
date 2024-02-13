@@ -33,9 +33,9 @@ router.get(
   "/google/redirect",
   passport.authenticate("google", {
     successRedirect:
-      "https://fast-plate.vercel.app/auth/login/success",
+      "https://fast-plat1.vercel.app/auth/login/success",
     failureRedirect:
-      "https://fast-plate.vercel.app/auth/login/failed",
+      "https://fast-plat1.vercel.app/auth/login/failed",
   })
 );
 router.post(
