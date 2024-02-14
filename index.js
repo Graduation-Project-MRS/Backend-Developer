@@ -1,7 +1,7 @@
 import path from 'path'
 import { fileURLToPath } from 'url'
 import dotenv from 'dotenv'
-import tipRoutes from './src/modules/tip/tipRoutes.js';
+
 
 //set directory dirname 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
