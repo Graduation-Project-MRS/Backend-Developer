@@ -4,7 +4,14 @@ import { validation } from "../../middleware/validation.js";
 import auth from "../../middleware/auth.js";
 import * as userController from "./controller/auth.js";
 import passport from "passport";
-const router = Router();
+
+//////tip/////
+// import { createTip, getAllTips } from '../tip/tipController.js';
+// import {validate} from '../../middleware/tipValidate.js';
+// import tipValidator from '../tip/tipValidator.js';
+
+
+ const router = Router();
 
 router.get(
   "/google",
@@ -71,4 +78,8 @@ router.patch(
   validation(Validators.resetPassword),
   userController.resetPasswordByCode
 );
+
+///////tip////////
+// router.post('/tip', validate(tipValidator), createTip);
+// router.get('/tips', getAllTips);
 export default router;

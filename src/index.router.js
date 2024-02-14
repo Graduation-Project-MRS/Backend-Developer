@@ -5,6 +5,7 @@ import passport from "passport";
 import pass from "../config/passport.stupp.js";
 import session from "express-session";
 import cors from "cors";
+import tipRoutes from './modules/tip/tipRoutes.js';
 const initApp = (app, express) => {
   app.use(cors());
   //convert Buffer Data
@@ -15,6 +16,8 @@ const initApp = (app, express) => {
   //Setup API Routing
   app.use(`/auth`, authRouter);
   app.use(`/meals`, mealsRouter);
+
+  app.use(`/Tips` ,tipRoutes)
 
   app.all("*", (req, res, next) => {
     res.send("In-valid Routing Plz check url  or  method");
