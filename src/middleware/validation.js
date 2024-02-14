@@ -35,7 +35,7 @@ export const validation = (Schema) => {
         ...req.body,
         ...req.params,
         ...req.query,
-        ...req.files,
+        ...req.file,
       };
       const validationResult = Schema.validate(copyReq, { abortEarly: false });
       if (validationResult.error) {
