@@ -1,4 +1,5 @@
 import joi from "joi";
+import { validateObjectId } from "../../middleware/validation.js";
 const arrayParsing = (value, helper) => {
   value = JSON.parse(value);
   const valueSchema = joi.object({
@@ -30,3 +31,8 @@ export const addAnewRecipe = joi.object({
   fieldname: joi.string().required(),
 });
 
+export const mealId = joi
+  .object({
+    mealId: joi.string().custom(validateObjectId),
+  })
+  .required();
