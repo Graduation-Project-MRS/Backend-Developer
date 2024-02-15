@@ -16,7 +16,7 @@ router.post(
 router.delete(
   "/deleteMeal/:mealId",
   auth,
-  validation(validators.productId),
+  validation(validators.mealId),
   mealController.deleteMeal
 );
 export default router;
