@@ -1,7 +1,7 @@
 import joi from 'joi'
 import { Types } from 'mongoose'
 
-const validateObjectId = (value, helper) => {
+export const validateObjectId = (value, helper) => {
     console.log({ value });
     console.log(helper);
     return Types.ObjectId.isValid(value) ? true : helper.message('In-valid objectId')
@@ -35,7 +35,7 @@ export const validation = (Schema) => {
         ...req.body,
         ...req.params,
         ...req.query,
-        ...req.files,
+        ...req.file,
       };
       const validationResult = Schema.validate(copyReq, { abortEarly: false });
       if (validationResult.error) {
