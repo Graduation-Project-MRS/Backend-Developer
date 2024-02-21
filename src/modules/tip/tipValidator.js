@@ -1,8 +1,7 @@
-import Joi from 'joi';
+import Joi from "joi";
 
-const tipSchema = Joi.object({
-  title: Joi.string().required(),
-  content: Joi.string().required()
+export const tipSchema = Joi.object({
+  title: Joi.string().min(3).max(31).required(),
+  content: Joi.string().min(10).required(),
 });
 
-export default tipSchema;
