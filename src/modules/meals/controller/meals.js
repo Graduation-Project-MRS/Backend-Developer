@@ -55,7 +55,7 @@ export const getallMeal = asyncHandler(async (req, res, next) => {
   return res.status(200).json({ success: true, result: products });
 });
 export const getMealId = asyncHandler(async (req, res, next) => {
-  const meals = await productModel.findById(req.params.mealId);
+  const meals = await mealsModel.findById(req.params.mealId);
   if (!meals) {
     return next(new Error("mealId not found", { cause: 404 }));
   }
