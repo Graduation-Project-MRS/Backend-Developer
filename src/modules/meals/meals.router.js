@@ -19,4 +19,10 @@ router.delete(
   validation(validators.mealId),
   mealController.deleteMeal
 );
+router.get("/", mealController.getallMeal);
+router.get(
+  "/single/:mealId",
+  validation(validators.mealId),
+  mealController.getMealId
+);
 export default router;

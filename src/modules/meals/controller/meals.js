@@ -46,7 +46,21 @@ export const addAnewRecipe = asyncHandler(async (req, res, next) => {
   return res.status(201).json({ success: true, data: meal });
 });
 
-
+export const getallMeal = asyncHandler(async (req, res, next) => {
+  const products = await mealsModel
+    .find({ ...req.query })
+    .pagination(req.query.page)
+    .customSelect(req.query.fields)
+    .sort(req.query.sort);
+  return res.status(200).json({ success: true, result: products });
+});
+export const getMealId = asyncHandler(async (req, res, next) => {
+  const meals = await productModel.findById(req.params.mealId);
+  if (!meals) {
+    return next(new Error("mealId not found", { cause: 404 }));
+  }
+  return res.json({ success: true, result: meals });
+});
 export const deleteMeal = asyncHandler(async (req, res, next) => {
   const meal = await mealsModel.findById(req.params.mealId);
   if (!meal) {
@@ -56,10 +70,10 @@ export const deleteMeal = asyncHandler(async (req, res, next) => {
   if (req.user._id.toString() !== meal.user.toString()) {
     return next(new Error("not allawed to delete", { cause: 401 }));
   }
-  
+
   const result = await cloudinary.uploader.destroy(meal.image.id);
   await cloudinary.api.delete_folder(
-    `${process.env.FOLDER_CLOUDINARY}/products/${meal.cloudFolder}`
+    `${process.env.FOLDER_CLOUDINARY}/meals/${meal.cloudFolder}`
   );
 
   await mealsModel.findByIdAndDelete(req.params.mealId);
