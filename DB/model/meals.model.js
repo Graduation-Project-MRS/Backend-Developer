@@ -8,7 +8,7 @@ const mealsSchema = new Schema(
       min: 8,
       max: 25,
     },
-    slug:{
+    slug: {
       type: String,
       required: true,
     },
