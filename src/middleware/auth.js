@@ -14,7 +14,6 @@ const auth = asyncHandler(async (req, res, next) => {
     return res.json({ message: "In-valid token payload" });
   }
   const tokenDB = await tokenModel.findOne({ token });
-console.log(tokenDB);
   if (!tokenDB || !tokenDB.isValid) {
     return next(new Error("Token expired!"));
   }
