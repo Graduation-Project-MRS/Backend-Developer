@@ -9,14 +9,17 @@ const famillySchema = new Schema(
     
     adults: {
       type: Number,
+      default:0,
       required: true,
     },
     babies: {
       type: Number,
+      default:0,
       required: true,
     },
     childeren: {
       type: Number,
+      default:0,
       required: true,
     },
   },
