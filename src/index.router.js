@@ -1,5 +1,6 @@
 import authRouter from "./modules/auth/auth.router.js";
 import mealsRouter from "./modules/meals/meals.router.js";
+import familyRouter from "./modules/familly/familly.router.js";
 import { globalErrorHandling } from "./utils/errorHandling.js";
 import passport from "passport";
 import pass from "../config/passport.stupp.js";
