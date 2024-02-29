@@ -10,7 +10,7 @@ const ingredientSchema = new mongoose.Schema({
      },
      quantity: {
         type: Number,
-        required: [true, 'Product quantity is required'],
+    //  required: [true, 'Product quantity is required'],
       },
     category: { 
         type: mongoose.Schema.Types.ObjectId, ref: 'Category', 
