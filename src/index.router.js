@@ -17,7 +17,7 @@ const initApp = (app, express) => {
   //Setup API Routing
   app.use(`/auth`, authRouter);
   app.use(`/meals`, mealsRouter);
-  app.use(`/family`, mealsRouter);
+  app.use(`/family`, familyRouter);
 
   app.use(`/Tips` ,tipRoutes)
 
