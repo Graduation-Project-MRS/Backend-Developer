@@ -5,19 +5,19 @@ import { validation } from "../../middleware/validation.js";
 import * as Validators from "./familly.validation.js";
 const router = Router();
 
-router.post(
+router.patch(
   "/addOrDeleteAdults",
   auth,
   validation(Validators.addOrDelete),
   famillyController.addOrDeleteAdults
 );
-router.post(
+router.patch(
   "/addOrDeleteBabies",
   auth,
   validation(Validators.addOrDelete),
   famillyController.addOrDeleteBabies
 );
-router.post(
+router.patch(
   "/addOrDeleteChildren",
   auth,
   validation(Validators.addOrDelete),
