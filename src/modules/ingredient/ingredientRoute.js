@@ -1,5 +1,4 @@
 import express from 'express';
-const router = express.Router();
 import { 
     getAllIngredients ,
     createIngredient,
@@ -7,10 +6,16 @@ import {
     updateIngredient,
     deleteIngredient } from './ingredientController.js';
 
-router.get('/', getAllIngredients);
-router.post('/', createIngredient);
-router.get('/:id', getIngredientById);
-router.put('/:id', updateIngredient);
-router.delete('/:id', deleteIngredient);
+import {validate} from '../../middleware/tipValidate.js';
+import ingredientValidator from './ingredientValidator.js';   
+
+const router = express.Router();
+
+
+router.post('/addIngredient', validate(ingredientValidator), createIngredient);
+router.get('/:categoryId/ingredients',getAllIngredients);
+router.get('/getIngredient/:id', getIngredientById);
+router.put('/updateIngredient/:id', updateIngredient);
+router.delete('/deleteIngredient/:id', deleteIngredient);
 
 export default router;

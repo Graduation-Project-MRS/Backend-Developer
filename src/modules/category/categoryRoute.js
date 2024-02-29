@@ -1,5 +1,4 @@
 import express from 'express';
-const router = express.Router();
 import { 
     getAllCategories,
     createCategory,
@@ -8,10 +7,17 @@ import {
     deleteCategory
  } from './categoryController.js';
 
-router.get('/', getAllCategories);
-router.post('/', createCategory);
-router.get('/:id', getCategoryById);
-router.put('/:id', updateCategory);
-router.delete('/:id', deleteCategory);
+
+import {validate} from '../../middleware/tipValidate.js';
+import categoryValidator from './categoryValidator.js';
+
+const router = express.Router();
+
+
+router.post('/addCategory', validate(categoryValidator),createCategory); //error
+router.get('/getCategories', getAllCategories);
+router.get('/getCategory/:id', getCategoryById);
+router.put('/updateCategory/:id', updateCategory); //error
+router.delete('/deleteCategory/:id', deleteCategory);
 
 export default router;

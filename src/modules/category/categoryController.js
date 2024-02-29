@@ -1,5 +1,5 @@
 import Category from '../../../DB/model/categoryModel.js';
-import categoryValidator from './categoryRoute.js';
+import categoryValidator from './categoryValidator.js';
 
 
 export const createCategory = async (req, res) => {

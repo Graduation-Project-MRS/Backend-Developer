@@ -1,7 +1,7 @@
 import authRouter from "./modules/auth/auth.router.js";
 import { globalErrorHandling } from "./utils/errorHandling.js";
 import passport from "passport";
-import pass from "../config/passport.stupp.js";
+import pass from"../config/passport.stupp.js";
 import session from "express-session";
 import cors from "cors";
 
@@ -21,7 +21,7 @@ const initApp = (app, express) => {
   //Setup API Routing
   app.use(`/auth`, authRouter);
 
-  app.use(`/Tips` ,tipRoutes)
+  app.use(`/Tips` ,tipRoutes);
   app.use(`/Categories`, categoryRoute);
   app.use(`/Ingredients`, ingredientRoute);
 
