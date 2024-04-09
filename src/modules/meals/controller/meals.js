@@ -45,7 +45,39 @@ export const addAnewRecipe = asyncHandler(async (req, res, next) => {
 
   return res.status(201).json({ success: true, data: meal });
 });
+const fetch = (...args) =>
+  import("node-fetch").then(({ default: fetch }) => fetch(...args));
 
+export const recommendMeal = asyncHandler(async (req, res, next) => {
+  const ingredients = req.body.ingredients;
+
+  const url = `https://wanna-meal.onrender.com/recommend?input_ingredients_str=${ingredients}`;
+  const options = {
+    method: "GET",
+    headers: {
+      "X-RapidAPI-Host": "famous-quotes4.p.rapidapi.com",
+      "X-RapidAPI-Key": "your-rapidapi-key",
+    },
+  };
+
+  try {
+    let response = await fetch(url, options);
+    response = await response.json();
+    for (let res of response.Recommendation) {
+      const { secure_url, public_id } = await cloudinary.uploader.upload(
+        res.img_link,
+        {
+          folder: `${process.env.FOLDER_CLOUDINARY}/recommend`,
+        }
+      );
+      res.img_link = { url: secure_url, id: public_id };
+    }
+    res.status(200).json(response);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ msg: `Internal Server Error.` });
+  }
+});
 export const getallMeal = asyncHandler(async (req, res, next) => {
   const products = await mealsModel
     .find({ ...req.query })
