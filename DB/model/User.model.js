@@ -45,23 +45,21 @@ const userSchema = new Schema(
       url: {
         type: String,
         default:
-          "https://res.cloudinary.com/dz5dpvxg7/image/upload/v1706484939/fast-plate/Screenshot_2022-09-10_040814_vhfktx.png",
+          "https://res.cloudinary.com/dgzucjqgi/image/upload/v1714199796/Screenshot_2024-04-27_093345-removebg-preview_v1b5gq.png",
       },
       id: {
         type: String,
         default:
-          "fast-plate/Screenshot_2022-09-10_040814_vhfktx.png",
+          "Screenshot_2024-04-27_093345-removebg-preview_v1b5gq.png",
       },
     },
     coverImages: [
       {
         url: {
           type: String,
-          required: true,
         },
         id: {
           type: String,
-          required: true,
         },
       },
     ],
