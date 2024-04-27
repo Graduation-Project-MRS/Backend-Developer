@@ -45,12 +45,12 @@ const userSchema = new Schema(
       url: {
         type: String,
         default:
-          "https://res.cloudinary.com/dgzucjqgi/image/upload/v1714199796/Screenshot_2024-04-27_093345-removebg-preview_v1b5gq.png",
+          "https://res.cloudinary.com/dgzucjqgi/image/upload/v1714200897/Screenshot_2024-04-27_093345-removebg-preview_t5oyup.png",
       },
       id: {
         type: String,
         default:
-          "Screenshot_2024-04-27_093345-removebg-preview_v1b5gq.png",
+          "Screenshot_2024-04-27_093345-removebg-preview_t5oyup.png",
       },
     },
     coverImages: [
