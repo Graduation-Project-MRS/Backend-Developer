@@ -12,6 +12,11 @@ const arrayParsing = (value, helper) => {
     return true;
   }
 };
+export const recommendMeal = joi
+  .object({
+    ingredients: joi.string().required(),
+  })
+  .required();
 export const addAnewRecipe = joi.object({
   recipeName: joi.string().min(8).max(25).required(),
   information: joi.string().required().min(8).max(180),
