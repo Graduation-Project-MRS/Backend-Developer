@@ -24,6 +24,16 @@ export const createIngredient = async (req, res) => {
 //     }
 // };
 
+// export const getAllIngredients = async (req, res) => {
+//     try {
+//         const categoryId = req.params.categoryId;
+//         const ingredients = await Ingredient.find({ categoryId: categoryId });
+//         res.json(ingredients);
+//     } catch (err) {
+//         res.status(500).json({ message: err.message });
+//     }
+// };
+//////////////////////////////////
 export const getAllIngredients = async (req, res) => {
     try {
         const categoryId = req.params.categoryId;
@@ -34,6 +44,7 @@ export const getAllIngredients = async (req, res) => {
     }
 };
 
+////////////////////////
 export const getIngredientById = async (req, res) => {
     try {
         const ingredient = await Ingredient.findById(req.params.id);
