@@ -41,7 +41,7 @@
 
 
 import multer from 'multer'
-export const fileValidation = {
+export const filterObject = {
     image: ['image/jpeg', 'image/png', 'image/gif'],
     file: ['application/pdf', 'application/msword'],
     video: ['video/mp4']

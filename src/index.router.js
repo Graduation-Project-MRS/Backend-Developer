@@ -1,4 +1,6 @@
 import authRouter from "./modules/auth/auth.router.js";
+import mealsRouter from "./modules/meals/meals.router.js";
+import familyRouter from "./modules/familly/familly.router.js";
 import { globalErrorHandling } from "./utils/errorHandling.js";
 import passport from "passport";
 import pass from"../config/passport.stupp.js";
@@ -20,6 +22,8 @@ const initApp = (app, express) => {
   app.use(passport.session());
   //Setup API Routing
   app.use(`/auth`, authRouter);
+  app.use(`/meals`, mealsRouter);
+  app.use(`/family`, familyRouter);
 
   app.use(`/Tips` ,tipRoutes);
   app.use(`/Categories`, categoryRoute);
