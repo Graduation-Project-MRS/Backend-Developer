@@ -5,6 +5,7 @@ const userSchema = new Schema(
     userName: {
       type: String,
       required: true,
+      unique: true,
       min: 3,
       max: 20,
     },
@@ -63,6 +64,22 @@ const userSchema = new Schema(
         },
       },
     ],
+    followers: {
+      type: [String],
+      default: [],
+    },
+    following: {
+      type: [String],
+      default: [],
+    },
+    bio: {
+      type: String,
+      default: "",
+    },
+    isFrozen:{
+      type: Boolean,
+      default: false
+    }
   },
   { timestamps: true }
 );

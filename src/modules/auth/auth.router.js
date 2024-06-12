@@ -4,14 +4,16 @@ import { validation } from "../../middleware/validation.js";
 import auth from "../../middleware/auth.js";
 import * as userController from "./controller/auth.js";
 import passport from "passport";
+import { fileUpload, filterObject } from "../../utils/multer.js";
 
 //////tip/////
 // import { createTip, getAllTips } from '../tip/tipController.js';
 // import {validate} from '../../middleware/tipValidate.js';
 // import tipValidator from '../tip/tipValidator.js';
 
-
- const router = Router();
+const router = Router();
+router.get("/profile/:query", userController.getProfile);
+router.get("/suggested", auth, userController.getSuggestedUsers);
 
 router.get(
   "/google",
@@ -39,10 +41,8 @@ router.get("/logout", (req, res, next) => {
 router.get(
   "/google/redirect",
   passport.authenticate("google", {
-    successRedirect:
-      "https://fast-plat1.vercel.app/auth/login/success",
-    failureRedirect:
-      "https://fast-plat1.vercel.app/auth/login/failed",
+    successRedirect: "https://fast-plat1.vercel.app/auth/login/success",
+    failureRedirect: "https://fast-plat1.vercel.app/auth/login/failed",
   })
 );
 router.post(
@@ -78,7 +78,14 @@ router.patch(
   validation(Validators.resetPassword),
   userController.resetPasswordByCode
 );
-
+router.post("/follow/:id", auth, userController.followUnFollowUser);
+router.put(
+  "/update/:id",
+  auth,
+  fileUpload(filterObject.image).single("imageProfile"),
+  userController.update
+);
+router.put("/freeze", auth, userController.freezeAccount);
 ///////tip////////
 // router.post('/tip', validate(tipValidator), createTip);
 // router.get('/tips', getAllTips);
