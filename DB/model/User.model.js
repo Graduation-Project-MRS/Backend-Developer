@@ -2,9 +2,14 @@ import mongoose, { Schema, Types, model } from "mongoose";
 
 const userSchema = new Schema(
   {
+    name: {
+      type: String,
+      required: true,
+    },
     userName: {
       type: String,
       required: true,
+      unique: true,
       min: 3,
       max: 20,
     },
@@ -63,6 +68,22 @@ const userSchema = new Schema(
         },
       },
     ],
+    followers: {
+      type: [String],
+      default: [],
+    },
+    following: {
+      type: [String],
+      default: [],
+    },
+    bio: {
+      type: String,
+      default: "",
+    },
+    isFrozen:{
+      type: Boolean,
+      default: false
+    }
   },
   { timestamps: true }
 );

@@ -8,6 +8,9 @@ import tokenModel from "../../../../DB/model/Token.model.js";
 import randomstring from "randomstring";
 import userModel from "../../../../DB/model/User.model.js";
 import famillyModel from "../../../../DB/model/famillyMember.js";
+import mongoose from "mongoose";
+import cloudinary from "../../../utils/cloudinary.js";
+
 
 export const register = asyncHandler(async (req, res, next) => {
   const { userName, email, password } = req.body;
@@ -90,13 +93,11 @@ export const login = asyncHandler(async (req, res, next) => {
   user.status = "online";
   await user.save();
 
-  return res
-    .status(200)
-    .json({
-      success: true,
-      token,
-      data: { userName: user.userName, profileImage: user.profileImage },
-    });
+  return res.status(200).json({
+    success: true,
+    token,
+    data: { userName: user.userName, profileImage: user.profileImage },
+  });
 });
 
 //send forget Code
@@ -172,4 +173,164 @@ export const VerifyCode = asyncHandler(async (req, res, next) => {
   return res
     .status(200)
     .json({ success: true, message: "go to reset new password" });
+});
+
+export const followUnFollowUser = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+  const userToModify = await userModel.findById(id);
+  const currentUser = await userModel.findById(req.user._id);
+  if (id.toString() === req.user._id.toString()) {
+    return next(
+      new Error("You can't follow/unfollow yourself!", { cause: 400 })
+    );
+  }
+  if (!userToModify || !currentUser) {
+    return next(new Error("User not found!", { cause: 404 }));
+  }
+  const isFollowing = currentUser.following.includes(id);
+  if (isFollowing) {
+    //unfollow user
+    await userModel.findByIdAndUpdate(req.user._id, {
+      $pull: { following: id },
+    });
+    await userModel.findByIdAndUpdate(id, {
+      $pull: { followers: req.user._id },
+    });
+    return res
+      .status(200)
+      .json({ success: true, message: "User unfollowed successfully!" });
+  } else {
+    //follow user
+    await userModel.findByIdAndUpdate(req.user._id, {
+      $push: { following: id },
+    });
+    await userModel.findByIdAndUpdate(id, {
+      $push: { followers: req.user._id },
+    });
+    return res
+      .status(200)
+      .json({ success: true, message: "User followed successfully!" });
+  }
+});
+
+export const update = asyncHandler(async (req, res, next) => {
+  const { name, email, password, userName, bio } = req.body;
+  const userId = req.user._id;
+  let user = await userModel.findById(userId);
+  if (!user) {
+    return next(new Error("User not found!", { cause: 404 }));
+  }
+  if (req.params.id.toString() !== userId.toString()) {
+    return next(
+      new Error("You cannot update other user's profile ", { cause: 401 })
+    );
+  }
+  if (password) {
+    const hashPassword = bcryptjs.hashSync(
+      password,
+      Number(process.env.SALT_ROUND)
+    );
+    user.password = hashPassword;
+  }
+  if (req.file) {
+    if (
+      user.profileImage.id ==
+      "Screenshot_2024-04-27_093345-removebg-preview_t5oyup.png"
+    ) {
+      const { public_id, secure_url } = await cloudinary.uploader.upload(
+        req.file.path,
+        {
+          folder: `${process.env.FOLDER_CLOUDINARY}/user/${user._id}`,
+        }
+      );
+      user.profileImage.url = secure_url;
+      user.profileImage.id = public_id;
+    } else {
+      const { public_id, secure_url } = await cloudinary.uploader.upload(
+        req.file.path,
+        {
+          public_id: user.profileImage.id,
+        }
+      );
+      user.profileImage.url = secure_url;
+    }
+  }
+  user.name = name || user.name;
+  user.email = email || user.email;
+  user.userName = userName || user.userName;
+  user.bio = bio || user.bio;
+  user = await user.save();
+  await postModel.updateMany(
+    { "replies.userId": userId },
+    {
+      $set: {
+        "replies.$[reply].userName": user.userName,
+        "replies.$[reply].profileImage": user.profileImage,
+      },
+    },
+    { arrayFilters: [{ "reply.userId": userId }] }
+  );
+  const userUpdated = await userModel.findById(user._id).select("-password");
+  return res
+    .status(200)
+    .json({ message: "profile updated successfully!", userUpdated });
+});
+
+export const getProfile = asyncHandler(async (req, res, next) => {
+  const { query } = req.params;
+  let user;
+  if (mongoose.Types.ObjectId.isValid(query)) {
+    user = await userModel
+      .findOne({ _id: query })
+      .select("-password -createdAt");
+  } else {
+    user = await userModel
+      .findOne({
+        userName: query,
+      })
+      .select("-password -createdAt");
+  }
+  if (!user) {
+    return next(new Error("User not found!", { cause: 404 }));
+  }
+  return res.status(200).json({ success: true, user });
+});
+
+export const getSuggestedUsers = asyncHandler(async (req, res, next) => {
+  const userId = req.user._id;
+
+  const usersFollowedByYou = await userModel
+    .findById(userId)
+    .select("following");
+
+  const users = await userModel.aggregate([
+    {
+      $match: {
+        _id: { $ne: userId },
+      },
+    },
+    {
+      $sample: { size: 10 },
+    },
+  ]);
+  const filteredUsers = users.filter(
+    (user) => !usersFollowedByYou.following.includes(user._id)
+  );
+  const suggestedUsers = filteredUsers.slice(0, 4);
+
+  suggestedUsers.forEach((user) => (user.password = null));
+
+  res.status(200).json(suggestedUsers);
+});
+
+export const freezeAccount = asyncHandler(async (req, res, next) => {
+  const user = await userModel.findById(req.user._id);
+  if (!user) {
+    return next(new Error("User not found!", { cause: 404 }));
+  }
+  user.isFrozen = !user.isFrozen;
+  await user.save();
+  return res
+    .status(200)
+    .json({ success: true, message: "Account frozen successfully!" });
 });
