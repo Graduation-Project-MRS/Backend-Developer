@@ -10,13 +10,22 @@ import userModel from "../../../../DB/model/User.model.js";
 import famillyModel from "../../../../DB/model/famillyMember.js";
 import mongoose from "mongoose";
 import cloudinary from "../../../utils/cloudinary.js";
-
+import postModel from "../../../../DB/model/post.model.js";
 
 export const register = asyncHandler(async (req, res, next) => {
   const { userName, email, password } = req.body;
-  const isUser = await userModel.findOne({ email });
+  const isUser = await userModel.findOne({
+    $or: [
+      {
+        email,
+      },
+      {
+        userName,
+      },
+    ],
+  });
   if (isUser) {
-    return next(new Error("email already registered !", { cause: 409 }));
+    return next(new Error("email or userName already registered !", { cause: 409 }));
   }
 
   const hashPassword = bcryptjs.hashSync(

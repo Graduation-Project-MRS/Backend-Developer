@@ -1,7 +1,7 @@
-import postModel from "../../../DB/models/post.model.js";
-import userModel from "../../../DB/models/user.model.js";
-import { asyncHandler } from "../../utils/asyncHandler.js";
-import cloudinary from "../../utils/cloud.js";
+import userModel from "../../../DB/model/User.model.js";
+import postModel from "../../../DB/model/post.model.js";
+import cloudinary from "../../utils/cloudinary.js";
+import { asyncHandler } from "../../utils/errorHandling.js";
 
 export const createPost = asyncHandler(async (req, res, next) => {
   const { postedBy, text } = req.body;
@@ -127,10 +127,10 @@ export const getFeedPosts = asyncHandler(async (req, res, next) => {
   }
 
   const following = user.following;
-  const feePosts = await postModel
+  const feedPosts = await postModel
     .find({ postedBy: { $in: following } })
     .sort({ createdAt: -1 });
-  return res.status(200).json({ success: true, feePosts });
+  return res.status(200).json({ success: true, feedPosts });
 });
 
 export const getUserPosts = asyncHandler(async (req, res, next) => {

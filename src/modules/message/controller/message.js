@@ -1,25 +1,31 @@
-import conversationModel from "../../../../DB/models/conversation.model.js";
-import messageModel from "../../../../DB/models/message.model.js";
 // import { getRecipientSocketId, io } from "../../../../index.js";
-import { asyncHandler } from "../../../utils/asyncHandler.js";
-import cloudinary from "../../../utils/cloud.js";
+import userModel from "../../../../DB/model/User.model.js";
+import conversationModel from "../../../../DB/model/conversation.model.js";
+import messageModel from "../../../../DB/model/message.model.js";
+import cloudinary from "../../../utils/cloudinary.js";
+import { asyncHandler } from "../../../utils/errorHandling.js";
 
 export const sendMessage = asyncHandler(async (req, res, next) => {
-  const { recipientId, message } = req.body;
+  const { message } = req.body;
+  const { id } = req.params;
   const senderId = req.user._id;
+  const user = await userModel.findById(id);
+  if (!user) {
+    return next(new Error("Recipient not found", { cause: 404 }));
+  }
   let conversation = await conversationModel.findOne({
-    participants: { $all: [senderId, recipientId] },
+    participants: { $all: [senderId, id] },
   });
   if (!conversation) {
     conversation = await conversationModel.create({
-      participants: [senderId, recipientId],
+      participants: [senderId, id],
       lastMessage: {
         senderId,
         text: message,
       },
     });
   }
- 
+
   const newMessage = await messageModel.create({
     conversationId: conversation._id,
     senderId,
@@ -37,7 +43,6 @@ export const sendMessage = asyncHandler(async (req, res, next) => {
       url: secure_url,
     };
     await newMessage.save();
-    
   }
   conversation.lastMessage = {
     senderId,
