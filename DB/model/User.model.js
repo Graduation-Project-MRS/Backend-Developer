@@ -50,8 +50,7 @@ const userSchema = new Schema(
       },
       id: {
         type: String,
-        default:
-          "Screenshot_2024-04-27_093345-removebg-preview_t5oyup.png",
+        default: "Screenshot_2024-04-27_093345-removebg-preview_t5oyup.png",
       },
     },
     coverImages: [
@@ -76,10 +75,17 @@ const userSchema = new Schema(
       type: String,
       default: "",
     },
-    isFrozen:{
+    isFrozen: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
+    isPremium: { type: Boolean, default: false },
+    ratings: [
+      {
+        meal: { type: Number },
+        rating: { type: Number, min: 1, max: 5 },
+      },
+    ],
   },
   { timestamps: true }
 );

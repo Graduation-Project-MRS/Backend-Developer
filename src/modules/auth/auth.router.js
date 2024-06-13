@@ -5,6 +5,7 @@ import auth from "../../middleware/auth.js";
 import * as userController from "./controller/auth.js";
 import passport from "passport";
 import { fileUpload, filterObject } from "../../utils/multer.js";
+import { requirePremium } from "../../middleware/Premium.js";
 
 //////tip/////
 // import { createTip, getAllTips } from '../tip/tipController.js';
@@ -12,8 +13,8 @@ import { fileUpload, filterObject } from "../../utils/multer.js";
 // import tipValidator from '../tip/tipValidator.js';
 
 const router = Router();
-router.get("/profile/:query", userController.getProfile);
-router.get("/suggested", auth, userController.getSuggestedUsers);
+router.get("/profile/:query",requirePremium, userController.getProfile);
+router.get("/suggested", auth,requirePremium, userController.getSuggestedUsers);
 
 router.get(
   "/google",
@@ -78,14 +79,27 @@ router.patch(
   validation(Validators.resetPassword),
   userController.resetPasswordByCode
 );
-router.post("/follow/:id", auth, userController.followUnFollowUser);
+router.post(
+  "/follow/:id",
+  auth,
+  requirePremium,
+  userController.followUnFollowUser
+);
 router.put(
   "/update/:id",
   auth,
+  requirePremium,
   fileUpload(filterObject.image).single("imageProfile"),
   userController.update
 );
-router.put("/freeze", auth, userController.freezeAccount);
+router.put(
+  "/update-premium/:userId",
+  auth,
+  requirePremium,
+  userController.updatePremium
+);
+router.put("/freeze", auth, requirePremium, userController.freezeAccount);
+
 ///////tip////////
 // router.post('/tip', validate(tipValidator), createTip);
 // router.get('/tips', getAllTips);
