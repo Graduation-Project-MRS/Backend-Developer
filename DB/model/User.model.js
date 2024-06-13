@@ -80,6 +80,12 @@ const userSchema = new Schema(
       default: false,
     },
     isPremium: { type: Boolean, default: false },
+    ratings: [
+      {
+        meal: { type: Number },
+        rating: { type: Number, min: 1, max: 5 },
+      },
+    ],
   },
   { timestamps: true }
 );
