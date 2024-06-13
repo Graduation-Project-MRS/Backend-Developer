@@ -25,7 +25,9 @@ export const register = asyncHandler(async (req, res, next) => {
     ],
   });
   if (isUser) {
-    return next(new Error("email or userName already registered !", { cause: 409 }));
+    return next(
+      new Error("email or userName already registered !", { cause: 409 })
+    );
   }
 
   const hashPassword = bcryptjs.hashSync(
@@ -89,7 +91,7 @@ export const login = asyncHandler(async (req, res, next) => {
   }
 
   const token = jwt.sign(
-    { id: user._id, email: user.email },
+    { id: user._id, email: user.email, isPremium: user.isPremium },
     process.env.TOKEN_SIGNATURE
   );
 
@@ -126,7 +128,7 @@ export const sendForgetCode = asyncHandler(async (req, res, next) => {
   user.forgetCode = code;
   await user.save();
   const token = jwt.sign(
-    { id: user._id, email: user.email },
+    { id: user._id, email: user.email, isPremium: user.isPremium },
     process.env.TOKEN_SIGNATURE
   );
   await tokenModel.create({
@@ -342,4 +344,20 @@ export const freezeAccount = asyncHandler(async (req, res, next) => {
   return res
     .status(200)
     .json({ success: true, message: "Account frozen successfully!" });
+});
+
+export const updatePremium = asyncHandler(async (req, res, next) => {
+  const { userId } = req.params;
+  const { isPremium } = req.body;
+
+  const user = await userModel.findById(userId);
+
+  if (!user) {
+    return res.status(404).send("User not found");
+  }
+
+  user.isPremium = isPremium;
+  await user.save();
+
+  res.send("User subscription status updated");
 });
