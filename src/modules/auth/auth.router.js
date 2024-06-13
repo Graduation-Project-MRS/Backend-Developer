@@ -95,7 +95,6 @@ router.put(
 router.put(
   "/update-premium/:userId",
   auth,
-  requirePremium,
   userController.updatePremium
 );
 router.put("/freeze", auth, requirePremium, userController.freezeAccount);
