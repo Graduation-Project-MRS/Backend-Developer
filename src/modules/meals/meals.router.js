@@ -24,6 +24,8 @@ router.get(
   validation(validators.recommendMeal),
   mealController.recommendMeal
 );
+router.put("/ratting/:mealId",auth,mealController.rattingMeal)
+router.get("/getUserRatting/:userId",mealController.getUserRatting)
 router.get("/", mealController.getallMeal);
 router.get(
   "/single/:mealId",

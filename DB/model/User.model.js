@@ -82,7 +82,7 @@ const userSchema = new Schema(
     isPremium: { type: Boolean, default: false },
     ratings: [
       {
-        meal: { type: Number },
+        mealId: { type: Number },
         rating: { type: Number, min: 1, max: 5 },
       },
     ],
