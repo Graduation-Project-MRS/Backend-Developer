@@ -128,13 +128,12 @@ export const rattingMeal = asyncHandler(async (req, res, next) => {
 
   if (existingRating) {
     existingRating.rating = rating;
-
   } else {
     user.ratings.push({ mealId, rating });
   }
 
   await user.save();
-  
+
   return res.status(200).json({
     success: true,
     message: "rating added",
@@ -143,11 +142,11 @@ export const rattingMeal = asyncHandler(async (req, res, next) => {
 });
 
 export const getUserRatting = asyncHandler(async (req, res, next) => {
-  const ratings = await userModel
-    .findById(req.params.userId)
-    .select("ratings.mealId ratings.rating -_id");
-  if (!ratings) {
+  const users = await userModel
+    .find({})
+    .select("_id userName ratings.mealId ratings.rating -_id");
+  if (!users) {
     return next(new Error("user not found", { cause: 404 }));
   }
-  return res.status(200).json({ success: true, ratings });
+  return res.status(200).json({ success: true, users });
 });
