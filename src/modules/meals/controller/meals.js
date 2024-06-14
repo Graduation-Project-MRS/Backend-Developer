@@ -3,6 +3,8 @@ import cloudinary from "../../../utils/cloudinary.js";
 import { nanoid } from "nanoid";
 import { asyncHandler } from "../../../utils/errorHandling.js";
 import slugify from "slugify";
+
+//add a meal
 export const addAnewRecipe = asyncHandler(async (req, res, next) => {
   const {
     recipeName,
@@ -46,6 +48,7 @@ export const addAnewRecipe = asyncHandler(async (req, res, next) => {
   return res.status(201).json({ success: true, data: meal });
 });
 
+//get all meals
 export const getallMeal = asyncHandler(async (req, res, next) => {
   const products = await mealsModel
     .find({ ...req.query })
@@ -54,6 +57,8 @@ export const getallMeal = asyncHandler(async (req, res, next) => {
     .sort(req.query.sort);
   return res.status(200).json({ success: true, result: products });
 });
+
+// get a meal
 export const getMealId = asyncHandler(async (req, res, next) => {
   const meals = await mealsModel.findById(req.params.mealId);
   if (!meals) {
@@ -61,6 +66,8 @@ export const getMealId = asyncHandler(async (req, res, next) => {
   }
   return res.json({ success: true, result: meals });
 });
+
+//delete a meal
 export const deleteMeal = asyncHandler(async (req, res, next) => {
   const meal = await mealsModel.findById(req.params.mealId);
   if (!meal) {

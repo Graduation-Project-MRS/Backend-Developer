@@ -56,3 +56,6 @@ export const resetPassword = joi
       .required(),
   })
   .required();
+
+export const updateLoggedUserValidator = joi
+

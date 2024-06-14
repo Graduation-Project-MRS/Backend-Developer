@@ -10,8 +10,7 @@ import passport from "passport";
 // import {validate} from '../../middleware/tipValidate.js';
 // import tipValidator from '../tip/tipValidator.js';
 
-
- const router = Router();
+const router = Router();
 
 router.get(
   "/google",
@@ -39,10 +38,8 @@ router.get("/logout", (req, res, next) => {
 router.get(
   "/google/redirect",
   passport.authenticate("google", {
-    successRedirect:
-      "https://fast-plat1.vercel.app/auth/login/success",
-    failureRedirect:
-      "https://fast-plat1.vercel.app/auth/login/failed",
+    successRedirect: "https://fast-plat1.vercel.app/auth/login/success",
+    failureRedirect: "https://fast-plat1.vercel.app/auth/login/failed",
   })
 );
 router.post(
@@ -78,6 +75,10 @@ router.patch(
   validation(Validators.resetPassword),
   userController.resetPasswordByCode
 );
+
+router.get("/getusers", userController.getUsers);
+router.get("/user:id", userController.getUser);
+router.put("/updateMe", userController.updateLoggedUserData);
 
 ///////tip////////
 // router.post('/tip', validate(tipValidator), createTip);
