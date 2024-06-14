@@ -3,6 +3,7 @@ import cloudinary from "../../../utils/cloudinary.js";
 import { nanoid } from "nanoid";
 import { asyncHandler } from "../../../utils/errorHandling.js";
 import slugify from "slugify";
+import userModel from "../../../../DB/model/User.model.js";
 export const addAnewRecipe = asyncHandler(async (req, res, next) => {
   const {
     recipeName,
@@ -112,4 +113,40 @@ export const deleteMeal = asyncHandler(async (req, res, next) => {
   return res
     .status(200)
     .json({ success: true, message: "meal delete successfully!" });
+});
+
+export const rattingMeal = asyncHandler(async (req, res, next) => {
+  const { mealId } = req.params;
+  const user = await userModel.findById(req.user._id);
+  const rating = req.body.rating;
+  if (rating < 0 || rating > 5) {
+    return next(new Error("rating must be between 0 and 5", { cause: 400 }));
+  }
+  let flag = false;
+  user.ratings.map((rating) => {
+    if (rating.mealId.toString() === mealId.toString()) {
+      flag = true;
+    }
+  });
+
+  if (flag) {
+    user.ratings.map((rating) => {
+      if (rating.mealId.toString() === mealId.toString()) {
+        rating.rating = req.body.rating;
+      }
+    });
+  } else {
+    user.ratings.push({ mealId, rating });
+  }
+  await user.save();
+  return res.status(200).json({
+    success: true,
+    message: "rating added",
+    data: { ratings: user.ratings },
+  });
+});
+
+export const getUserRatting = asyncHandler(async (req, res, next) => {
+  const user = await userModel.findById(req.params.userId);
+  return res.status(200).json({ success: true, data: user.ratings });
 });
