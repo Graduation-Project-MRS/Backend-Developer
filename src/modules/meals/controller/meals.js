@@ -122,23 +122,19 @@ export const rattingMeal = asyncHandler(async (req, res, next) => {
   if (rating < 0 || rating > 5) {
     return next(new Error("rating must be between 0 and 5", { cause: 400 }));
   }
-  let flag = false;
-  user.ratings.map((rating) => {
-    if (rating.mealId.toString() === mealId.toString()) {
-      flag = true;
-    }
-  });
+  const existingRating = user.ratings.find(
+    (r) => r.mealId.toString() === mealId.toString()
+  );
 
-  if (flag) {
-    user.ratings.map((rating) => {
-      if (rating.mealId.toString() === mealId.toString()) {
-        rating.rating = req.body.rating;
-      }
-    });
+  if (existingRating) {
+    existingRating.rating = rating;
+
   } else {
     user.ratings.push({ mealId, rating });
   }
+
   await user.save();
+  
   return res.status(200).json({
     success: true,
     message: "rating added",
@@ -147,6 +143,11 @@ export const rattingMeal = asyncHandler(async (req, res, next) => {
 });
 
 export const getUserRatting = asyncHandler(async (req, res, next) => {
-  const user = await userModel.findById(req.params.userId);
-  return res.status(200).json({ success: true, data: user.ratings });
+  const ratings = await userModel
+    .findById(req.params.userId)
+    .select("ratings.mealId ratings.rating -_id");
+  if (!ratings) {
+    return next(new Error("user not found", { cause: 404 }));
+  }
+  return res.status(200).json({ success: true, ratings });
 });
