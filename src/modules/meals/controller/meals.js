@@ -144,7 +144,7 @@ export const rattingMeal = asyncHandler(async (req, res, next) => {
 export const getUserRatting = asyncHandler(async (req, res, next) => {
   const users = await userModel
     .find({})
-    .select("_id userName ratings.mealId ratings.rating -_id");
+    .select("_id userName ratings.mealId ");
   if (!users) {
     return next(new Error("user not found", { cause: 404 }));
   }
