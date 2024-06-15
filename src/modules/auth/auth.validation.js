@@ -104,7 +104,7 @@ export const lang = joi
 export const updatePremium = joi
   .object({
     userId: joi.string().custom(validateObjectId).required(),
-    premium: joi.boolean().required(),
+    isPremium: joi.boolean().required(),
     lang: joi.string().valid("eng", "arab").required(),
   })
   .required();
