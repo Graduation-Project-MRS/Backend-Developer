@@ -13,8 +13,19 @@ import { requirePremium } from "../../middleware/Premium.js";
 // import tipValidator from '../tip/tipValidator.js';
 
 const router = Router();
-router.get("/profile/:query",requirePremium, userController.getProfile);
-router.get("/suggested", auth,requirePremium, userController.getSuggestedUsers);
+router.get(
+  "/profile/:query",
+  validation(Validators.getProfile),
+  requirePremium,
+  userController.getProfile
+);
+router.get(
+  "/suggested",
+  auth,
+  validation(Validators.lang),
+  requirePremium,
+  userController.getSuggestedUsers
+);
 
 router.get(
   "/google",
@@ -82,12 +93,14 @@ router.patch(
 router.post(
   "/follow/:id",
   auth,
+  validation(Validators.followUnFollowUser),
   requirePremium,
   userController.followUnFollowUser
 );
 router.put(
   "/update/:id",
   auth,
+  validation(Validators.update),
   requirePremium,
   fileUpload(filterObject.image).single("imageProfile"),
   userController.update
@@ -95,9 +108,16 @@ router.put(
 router.put(
   "/update-premium/:userId",
   auth,
+  validation(Validators.updatePremium),
   userController.updatePremium
 );
-router.put("/freeze", auth, requirePremium, userController.freezeAccount);
+router.put(
+  "/freeze",
+  auth,
+  validation(Validators.lang),
+  requirePremium,
+  userController.freezeAccount
+);
 
 ///////tip////////
 // router.post('/tip', validate(tipValidator), createTip);
