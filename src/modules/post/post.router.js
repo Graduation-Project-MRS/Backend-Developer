@@ -11,7 +11,10 @@ router.post(
   "/create",
   auth,
   requirePremium,
-  fileUpload(filterObject.image).single("img"),
+  fileUpload([...filterObject.image, ...filterObject.video]).fields([
+    { name: "img", maxCount: 1 },
+    { name: "video", maxCount: 1 },
+  ]),
   postController.createPost
 );
 router.get("/feed", auth, requirePremium, postController.getFeedPosts);
