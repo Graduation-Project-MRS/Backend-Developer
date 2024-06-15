@@ -15,6 +15,7 @@ import { requirePremium } from "../../middleware/Premium.js";
 const router = Router();
 router.get(
   "/profile/:query",
+  auth,
   validation(Validators.getProfile),
   requirePremium,
   userController.getProfile

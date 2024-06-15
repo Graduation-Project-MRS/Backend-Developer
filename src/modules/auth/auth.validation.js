@@ -92,7 +92,7 @@ export const update = joi
   .required();
 export const getProfile = joi
   .object({
-    //  query:joi.string().valid(custom(validateObjectId), 'username').required() ,
+     query:joi.string().required() ,
     lang: joi.string().valid("eng", "arab").required(),
   })
   .required();
