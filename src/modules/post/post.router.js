@@ -18,8 +18,8 @@ router.post(
   postController.createPost
 );
 router.get("/feed", auth, requirePremium, postController.getFeedPosts);
-router.get("/:id", requirePremium, postController.getPost);
-router.get("/user/:userName", requirePremium, postController.getUserPosts);
+router.get("/:id",auth ,requirePremium, postController.getPost);
+router.get("/user/:userName",auth, requirePremium, postController.getUserPosts);
 router.delete("/:id", auth, requirePremium, postController.deletePost);
 router.put("/like/:id", auth, requirePremium, postController.likeUnLikePost);
 router.put("/reply/:id", auth, requirePremium, postController.replyToPost);
