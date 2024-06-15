@@ -27,21 +27,30 @@ export const createPost = asyncHandler(async (req, res, next) => {
     postedBy,
     text,
   });
-  if (req.file) {
-    const { public_id, secure_url } = await cloudinary.uploader.upload(
-      req.file.path,
+  if (req.files && req.files.img) {
+    const { secure_url, public_id } = await cloudinary.uploader.upload(
+      req.files.img[0].path,
       {
-        folder: `${process.env.FOLDER_CLOUDINARY}/post/${post.postedBy}`,
+        folder: `${process.env.FOLDER_CLOUDINARY}/post/${post.postedBy}/img`,
       }
     );
-    post.img = {
-      id: public_id,
-      url: secure_url,
-    };
+    post.img = { url: secure_url, id: public_id };
     await post.save();
   }
-
-  return res.status(201).json({ success: true, data: post });
+  if (req.files && req.files.video) {
+    const { secure_url, public_id } = await cloudinary.uploader.upload(
+      req.files.video[0].path,
+      {
+        resource_type: "video",
+        folder: `${process.env.FOLDER_CLOUDINARY}/post/${post.postedBy}/video`,
+      }
+    );
+    post.video = { url: secure_url, id: public_id };
+    await post.save();
+  }
+  res
+    .status(201)
+    .json({ success: true, message: "Post created successfully", post });
 });
 
 export const getPost = asyncHandler(async (req, res, next) => {

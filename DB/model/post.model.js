@@ -18,6 +18,14 @@ const postSchema = new Schema(
         type: String,
       },
     },
+    video: {
+      url: {
+        type: String,
+      },
+      id: {
+        type: String,
+      },
+    },
     likes: {
       type: [Types.ObjectId],
       ref: "User",
