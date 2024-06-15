@@ -399,7 +399,7 @@ export const getProfile = asyncHandler(async (req, res, next) => {
   }
   return res.status(200).json({
     success: true,
-    user: req.query.lang === "eng" ? user : await translate(user, { to: "ar" }),
+    user: req.query.lang === "eng" ? user : (await translate(user, { to: "ar" })).text,
   });
 });
 
