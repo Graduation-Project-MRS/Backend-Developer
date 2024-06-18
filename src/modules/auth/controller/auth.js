@@ -51,7 +51,9 @@ export const register = asyncHandler(async (req, res, next) => {
     activationCode,
   });
 
-  const link = `https://fast-plat1.vercel.app/auth/confirmEmail/${activationCode}`;
+  const link = `https://fast-plat1.vercel.app/auth/confirmEmail/${activationCode}?lang=${
+    req.query.lang || "eng"
+  }`;
 
   const isSent = await sendEmail({
     to: email,
@@ -399,7 +401,10 @@ export const getProfile = asyncHandler(async (req, res, next) => {
   }
   return res.status(200).json({
     success: true,
-    user: req.query.lang === "eng" ? user : (await translate(user, { to: "ar" })).text,
+    user:
+      req.query.lang === "eng"
+        ? user
+        : (await translate(user, { to: "ar" })).text,
   });
 });
 
@@ -445,15 +450,13 @@ export const freezeAccount = asyncHandler(async (req, res, next) => {
   }
   user.isFrozen = !user.isFrozen;
   await user.save();
-  return res
-    .status(200)
-    .json({
-      success: true,
-      message:
-        req.query.lang === "eng"
-          ? "Account frozen successfully!"
-          : "تم تجميد الحساب بنجاح!",
-    });
+  return res.status(200).json({
+    success: true,
+    message:
+      req.query.lang === "eng"
+        ? "Account frozen successfully!"
+        : "تم تجميد الحساب بنجاح!",
+  });
 });
 
 export const updatePremium = asyncHandler(async (req, res, next) => {
@@ -463,11 +466,17 @@ export const updatePremium = asyncHandler(async (req, res, next) => {
   const user = await userModel.findById(userId);
 
   if (!user) {
-    return res.status(404).send((req.query.lang === "eng")?"User not found":"المستخدم غير موجود");
+    return res
+      .status(404)
+      .send(req.query.lang === "eng" ? "User not found" : "المستخدم غير موجود");
   }
 
   user.isPremium = isPremium;
   await user.save();
 
-  res.send((req.query.lang === "eng")?"User subscription status updated":"تم تحديث حالة اشتراك المستخدم");
+  res.send(
+    req.query.lang === "eng"
+      ? "User subscription status updated"
+      : "تم تحديث حالة اشتراك المستخدم"
+  );
 });
