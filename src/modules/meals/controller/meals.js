@@ -58,10 +58,6 @@ export const recommendMeal = asyncHandler(async (req, res, next) => {
   const url = `https://wanna-meal.onrender.com/recommend?input_ingredients_str=${ingredients}`;
   const options = {
     method: "GET",
-    headers: {
-      "X-RapidAPI-Host": "famous-quotes4.p.rapidapi.com",
-      "X-RapidAPI-Key": "your-rapidapi-key",
-    },
   };
 
   try {
@@ -157,4 +153,27 @@ export const getUserRatting = asyncHandler(async (req, res, next) => {
     return next(new Error("user not found", { cause: 404 }));
   }
   return res.status(200).json({ success: true, users });
+});
+
+export const commonMeals = asyncHandler(async (req, res, next) => {
+  const userId = req.user._id;
+  try {
+    const response = await fetch(
+      `https://colls.onrender.com/recommend?user_id=${userId}`,
+      {
+        method: "Get",
+      }
+    );
+      
+    if (!response.ok) {
+      throw new Error(`Error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const { common_meals } = data;
+    return res.status(200).json({ success: true, commonMeals: common_meals });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
