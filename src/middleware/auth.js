@@ -5,7 +5,7 @@ import tokenModel from "../../DB/model/Token.model.js";
 
 const auth = asyncHandler(async (req, res, next) => {
   let token = req.headers["token"];
-  console.log(token);
+  
   if (!token) {
     return res.json({ message: "In-valid token" });
   }

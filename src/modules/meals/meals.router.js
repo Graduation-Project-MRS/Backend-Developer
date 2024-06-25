@@ -19,6 +19,13 @@ router.delete(
   validation(validators.mealId),
   mealController.deleteMeal
 );
+router.get(
+  "/recommendMeal",
+  validation(validators.recommendMeal),
+  mealController.recommendMeal
+);
+router.put("/ratting/:mealId",auth,mealController.rattingMeal)
+router.get("/getUserRatting",mealController.getUserRatting)
 router.get("/", mealController.getallMeal);
 router.get(
   "/single/:mealId",
