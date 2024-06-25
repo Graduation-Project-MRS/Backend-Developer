@@ -1,4 +1,5 @@
 import express from 'express';
+
 import { createTip, getAllTips, deleteTip, updateTip } from './tipController.js';
 import * as validators from "./tipValidator.js";
 import { validation } from "../../middleware/validation.js";

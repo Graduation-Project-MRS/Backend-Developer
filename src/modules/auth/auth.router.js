@@ -13,6 +13,7 @@ import { requirePremium } from "../../middleware/Premium.js";
 // import tipValidator from '../tip/tipValidator.js';
 
 const router = Router();
+
 router.get(
   "/profile/:query",
   auth,
@@ -27,6 +28,7 @@ router.get(
   requirePremium,
   userController.getSuggestedUsers
 );
+
 
 router.get(
   "/google",
@@ -119,6 +121,10 @@ router.put(
   requirePremium,
   userController.freezeAccount
 );
+
+router.get("/getusers", userController.getUsers);
+router.get("/user:id", userController.getUser);
+router.put("/updateMe", userController.updateLoggedUserData);
 
 ///////tip////////
 // router.post('/tip', validate(tipValidator), createTip);

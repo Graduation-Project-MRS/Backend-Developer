@@ -124,7 +124,9 @@ export const login = asyncHandler(async (req, res, next) => {
   }
 
   const token = jwt.sign(
+
     { id: user._id, email: user.email, isPremium: user.isPremium },
+
     process.env.TOKEN_SIGNATURE
   );
 
@@ -170,7 +172,9 @@ export const sendForgetCode = asyncHandler(async (req, res, next) => {
   user.forgetCode = code;
   await user.save();
   const token = jwt.sign(
+
     { id: user._id, email: user.email, isPremium: user.isPremium },
+
     process.env.TOKEN_SIGNATURE
   );
   await tokenModel.create({
@@ -184,6 +188,7 @@ export const sendForgetCode = asyncHandler(async (req, res, next) => {
       req.query.lang === "eng" ? "Reset Password" : "إعادة تعيين كلمة المرور",
     html: resetPassword(code),
   }))
+
     ? res.status(200).json({
         success: true,
         message:
@@ -197,6 +202,7 @@ export const sendForgetCode = asyncHandler(async (req, res, next) => {
           ? new Error("Something went wrong!", { cause: 400 })
           : new Error("حدث خطأ ما!", { cause: 400 })
       );
+
 });
 
 export const resetPasswordByCode = asyncHandler(async (req, res, next) => {
@@ -226,11 +232,13 @@ export const resetPasswordByCode = asyncHandler(async (req, res, next) => {
 export const VerifyCode = asyncHandler(async (req, res, next) => {
   const user = await userModel.findOne({ email: req.user.email });
   if (!user.forgetCode) {
+
     return next(
       req.query.lang === "eng"
         ? new Error("go to resend forget code", { status: 400 })
         : new Error("انتقل لإعادة إرسال كود التاكيد", { status: 400 })
     );
+
   }
   if (user.forgetCode !== req.body.forgetCode) {
     return next(
@@ -243,6 +251,7 @@ export const VerifyCode = asyncHandler(async (req, res, next) => {
     { email: req.user.email },
     { $unset: { forgetCode: 1 } }
   );
+
 
   return res.status(200).json({
     success: true,
@@ -479,4 +488,42 @@ export const updatePremium = asyncHandler(async (req, res, next) => {
       ? "User subscription status updated"
       : "تم تحديث حالة اشتراك المستخدم"
   );
+
+});
+
+// get all users
+// role ==> admin
+export const getUsers = asyncHandler(async (req, res) => {
+  //pagination
+  const page = req.query.page * 1 || 1;
+  const limit = req.query.limit * 1 || 10;
+  const skip = (page - 1) * limit;
+
+  const users = await userModel.find({}).skip(skip).limit(limit);
+  res.status(200).json({ results: users.length, page, data: users });
+});
+
+//get specific user
+// role ==> admin
+export const getUser = asyncHandler(async (req, res) => {
+  const user = await userModel.findById(req.params.id);
+  if (!user) {
+    res.status(404).json({ message: "User not found" });
+    return;
+  }
+  res.status(200).json(user);
+});
+
+//update logged user data (wihout role and password)
+export const updateLoggedUserData = asyncHandler(async (req, res, next) => {
+  const updatedUser = await userModel.findByIdAndUpdate(
+    req.user._id,
+    {
+      name: req.body.name,
+      email: req.body.email,
+      phone: req.body.phone,
+    },
+    { new: true }
+  );
+  res.status(200).json({data : updatedUser});
 });

@@ -108,3 +108,6 @@ export const updatePremium = joi
     lang: joi.string().valid("eng", "arab").required(),
   })
   .required();
+
+export const updateLoggedUserValidator = joi
+
