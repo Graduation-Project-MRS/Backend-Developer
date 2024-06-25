@@ -3,7 +3,9 @@ import cloudinary from "../../../utils/cloudinary.js";
 import { nanoid } from "nanoid";
 import { asyncHandler } from "../../../utils/errorHandling.js";
 import slugify from "slugify";
+
 import userModel from "../../../../DB/model/User.model.js";
+
 export const addAnewRecipe = asyncHandler(async (req, res, next) => {
   const {
     recipeName,
@@ -49,6 +51,7 @@ export const addAnewRecipe = asyncHandler(async (req, res, next) => {
 const fetch = (...args) =>
   import("node-fetch").then(({ default: fetch }) => fetch(...args));
 
+
 export const recommendMeal = asyncHandler(async (req, res, next) => {
   const ingredients = req.body.ingredients;
 
@@ -75,6 +78,7 @@ export const recommendMeal = asyncHandler(async (req, res, next) => {
     res.status(500).json({ msg: `Internal Server Error.` });
   }
 });
+
 export const getallMeal = asyncHandler(async (req, res, next) => {
   const products = await mealsModel
     .find({ ...req.query })
@@ -83,6 +87,8 @@ export const getallMeal = asyncHandler(async (req, res, next) => {
     .sort(req.query.sort);
   return res.status(200).json({ success: true, result: products });
 });
+
+// get a meal
 export const getMealId = asyncHandler(async (req, res, next) => {
   const meals = await mealsModel.findById(req.params.mealId);
   if (!meals) {
@@ -90,6 +96,8 @@ export const getMealId = asyncHandler(async (req, res, next) => {
   }
   return res.json({ success: true, result: meals });
 });
+
+//delete a meal
 export const deleteMeal = asyncHandler(async (req, res, next) => {
   const meal = await mealsModel.findById(req.params.mealId);
   if (!meal) {
