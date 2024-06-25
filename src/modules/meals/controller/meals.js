@@ -170,8 +170,8 @@ export const commonMeals = asyncHandler(async (req, res, next) => {
     }
 
     const data = await response.json();
-    const { common_meals } = data;
-    return res.status(200).json({ success: true, commonMeals: common_meals });
+
+    return res.status(200).json({ success: true, commonMeals: data });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal server error" });
