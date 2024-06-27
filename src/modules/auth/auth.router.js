@@ -122,11 +122,6 @@ router.put(
   userController.freezeAccount
 );
 
-router.get("/getusers", userController.getUsers);
-router.get("/user:id", userController.getUser);
-router.put("/updateMe", userController.updateLoggedUserData);
 
-///////tip////////
-// router.post('/tip', validate(tipValidator), createTip);
-// router.get('/tips', getAllTips);
+
 export default router;
