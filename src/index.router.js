@@ -36,10 +36,6 @@ const initApp = (app, express) => {
   app.all("*", (req, res, next) => {
     next(new ApiError(`can't find this route :${req.originalUrl} `, 400));
   });
-
-  app.all("*", (req, res, next) => {
-    next(new ApiError(`can't find this route :${req.originalUrl} `, 400));
-  });
   app.all("*", (req, res, next) => {
     res.send("In-valid Routing Plz check url  or  method");
   });
