@@ -7,10 +7,11 @@ import pass from"../config/passport.stupp.js";
 import session from "express-session";
 import cors from "cors";
 
-
+import ApiError from "./utils/apiError.js";
 import tipRoutes from './modules/tip/tipRoutes.js';
 import categoryRoute from './modules/category/categoryRoute.js';
 import ingredientRoute from './modules/ingredient/ingredientRoute.js';
+import userRoute from './modules/auth/userRoute.js'
 
 
 const initApp = (app, express) => {
@@ -28,6 +29,11 @@ const initApp = (app, express) => {
   app.use(`/Tips` ,tipRoutes);
   app.use(`/Categories`, categoryRoute);
   app.use(`/Ingredients`, ingredientRoute);
+  app.use(`/users`, userRoute);
+
+  app.all("*", (req, res, next) => {
+    next(new ApiError(`can't find this route :${req.originalUrl} `, 400));
+  });
 
   app.all("*", (req, res, next) => {
     res.send("In-valid Routing Plz check url  or  method");

@@ -1,23 +1,33 @@
 import express from 'express';
+import { allowedTo }  from "../auth/controller/auth.js"
+import auth from "../../middleware/auth.js";
+
+import {
+    getCategoryValidator,
+    createCategoryValidator,
+    updateCategoryValidator,
+    deleteCategoryValidator,
+} from "./categoryValidator.js" 
 import { 
-    getAllCategories,
+    getCategories,
     createCategory,
-    getCategoryById,
+    getCategory,
     updateCategory,
     deleteCategory
  } from './categoryController.js';
 
+import ingredientRoute from "../ingredient/ingredientRoute.js"
 
-import {validate} from '../../middleware/tipValidate.js';
-import categoryValidator from './categoryValidator.js';
 
 const router = express.Router();
 
+router.use('/:categoryId/ingredients', ingredientRoute);
 
-router.post('/addCategory', validate(categoryValidator),createCategory); //error
-router.get('/getCategories', getAllCategories);
-router.get('/getCategory/:id', getCategoryById);
-router.put('/updateCategory/:id', updateCategory); //error
-router.delete('/deleteCategory/:id', deleteCategory);
+
+router.post('/addCategory', auth, allowedTo, createCategoryValidator, createCategory); 
+router.get('/getCategories', auth, getCategories);
+router.get('/getCategory/:id', auth, allowedTo, getCategoryValidator, getCategory);
+router.put('/updateCategory/:id', auth, allowedTo, updateCategoryValidator, updateCategory); 
+router.delete('/deleteCategory/:id', auth, allowedTo, deleteCategoryValidator, deleteCategory);
 
 export default router;

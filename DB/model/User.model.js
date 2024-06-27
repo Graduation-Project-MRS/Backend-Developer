@@ -18,6 +18,7 @@ const userSchema = new Schema(
     password: {
       type: String,
     },
+    passwordChangedAt: Date,
     gender: {
       type: String,
       enum: ["male", "female"],
