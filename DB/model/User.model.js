@@ -5,6 +5,7 @@ const userSchema = new Schema(
     userName: {
       type: String,
       required: true,
+      unique: true,
       min: 3,
       max: 20,
     },
@@ -46,24 +47,44 @@ const userSchema = new Schema(
       url: {
         type: String,
         default:
-          "https://res.cloudinary.com/dz5dpvxg7/image/upload/v1706484939/fast-plate/Screenshot_2022-09-10_040814_vhfktx.png",
+          "https://res.cloudinary.com/dgzucjqgi/image/upload/v1714200897/Screenshot_2024-04-27_093345-removebg-preview_t5oyup.png",
       },
       id: {
         type: String,
-        default:
-          "fast-plate/Screenshot_2022-09-10_040814_vhfktx.png",
+        default: "Screenshot_2024-04-27_093345-removebg-preview_t5oyup.png",
       },
     },
     coverImages: [
       {
         url: {
           type: String,
-          required: true,
         },
         id: {
           type: String,
-          required: true,
         },
+      },
+    ],
+    followers: {
+      type: [String],
+      default: [],
+    },
+    following: {
+      type: [String],
+      default: [],
+    },
+    bio: {
+      type: String,
+      default: "",
+    },
+    isFrozen: {
+      type: Boolean,
+      default: false,
+    },
+    isPremium: { type: Boolean, default: false },
+    ratings: [
+      {
+        mealId: { type: Number },
+        rating: { type: Number, min: 1, max: 5 },
       },
     ],
   },

@@ -4,7 +4,8 @@ import { nanoid } from "nanoid";
 import { asyncHandler } from "../../../utils/errorHandling.js";
 import slugify from "slugify";
 
-//add a meal
+import userModel from "../../../../DB/model/User.model.js";
+
 export const addAnewRecipe = asyncHandler(async (req, res, next) => {
   const {
     recipeName,
@@ -47,8 +48,41 @@ export const addAnewRecipe = asyncHandler(async (req, res, next) => {
 
   return res.status(201).json({ success: true, data: meal });
 });
+const fetch = (...args) =>
+  import("node-fetch").then(({ default: fetch }) => fetch(...args));
 
-//get all meals
+
+export const recommendMeal = asyncHandler(async (req, res, next) => {
+  const ingredients = req.body.ingredients;
+
+  const url = `https://wanna-meal.onrender.com/recommend?input_ingredients_str=${ingredients}`;
+  const options = {
+    method: "GET",
+    headers: {
+      "X-RapidAPI-Host": "famous-quotes4.p.rapidapi.com",
+      "X-RapidAPI-Key": "your-rapidapi-key",
+    },
+  };
+
+  try {
+    let response = await fetch(url, options);
+    response = await response.json();
+    for (let res of response.Recommendation) {
+      const { secure_url, public_id } = await cloudinary.uploader.upload(
+        res.img_link,
+        {
+          folder: `${process.env.FOLDER_CLOUDINARY}/recommend`,
+        }
+      );
+      res.img_link = { url: secure_url, id: public_id };
+    }
+    res.status(200).json(response);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ msg: `Internal Server Error.` });
+  }
+});
+
 export const getallMeal = asyncHandler(async (req, res, next) => {
   const products = await mealsModel
     .find({ ...req.query })
@@ -87,4 +121,40 @@ export const deleteMeal = asyncHandler(async (req, res, next) => {
   return res
     .status(200)
     .json({ success: true, message: "meal delete successfully!" });
+});
+
+export const rattingMeal = asyncHandler(async (req, res, next) => {
+  const { mealId } = req.params;
+  const user = await userModel.findById(req.user._id);
+  const rating = req.body.rating;
+  if (rating < 0 || rating > 5) {
+    return next(new Error("rating must be between 0 and 5", { cause: 400 }));
+  }
+  const existingRating = user.ratings.find(
+    (r) => r.mealId.toString() === mealId.toString()
+  );
+
+  if (existingRating) {
+    existingRating.rating = rating;
+  } else {
+    user.ratings.push({ mealId, rating });
+  }
+
+  await user.save();
+
+  return res.status(200).json({
+    success: true,
+    message: "rating added",
+    data: { ratings: user.ratings },
+  });
+});
+
+export const getUserRatting = asyncHandler(async (req, res, next) => {
+  const users = await userModel
+    .find({})
+    .select("_id userName ratings.mealId ratings.rating");
+  if (!users) {
+    return next(new Error("user not found", { cause: 404 }));
+  }
+  return res.status(200).json({ success: true, users });
 });
