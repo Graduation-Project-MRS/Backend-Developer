@@ -491,39 +491,15 @@ export const updatePremium = asyncHandler(async (req, res, next) => {
 
 });
 
-// get all users
-// role ==> admin
-export const getUsers = asyncHandler(async (req, res) => {
-  //pagination
-  const page = req.query.page * 1 || 1;
-  const limit = req.query.limit * 1 || 10;
-  const skip = (page - 1) * limit;
 
-  const users = await userModel.find({}).skip(skip).limit(limit);
-  res.status(200).json({ results: users.length, page, data: users });
-});
 
-//get specific user
-// role ==> admin
-export const getUser = asyncHandler(async (req, res) => {
-  const user = await userModel.findById(req.params.id);
-  if (!user) {
-    res.status(404).json({ message: "User not found" });
-    return;
+
+export const allowedTo = asyncHandler(async (req, res, next) => {
+  //1- access roles  2- access login user (req.user.role)
+  const userRole = req.user.role; // 
+  if (userRole !== 'admin') {
+    return res.status(403).json({ message: 'Access denied. Admins only.' });
   }
-  res.status(200).json(user);
-});
 
-//update logged user data (wihout role and password)
-export const updateLoggedUserData = asyncHandler(async (req, res, next) => {
-  const updatedUser = await userModel.findByIdAndUpdate(
-    req.user._id,
-    {
-      name: req.body.name,
-      email: req.body.email,
-      phone: req.body.phone,
-    },
-    { new: true }
-  );
-  res.status(200).json({data : updatedUser});
+  next();
 });

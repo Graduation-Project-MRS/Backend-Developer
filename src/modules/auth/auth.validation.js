@@ -109,5 +109,5 @@ export const updatePremium = joi
   })
   .required();
 
-export const updateLoggedUserValidator = joi
+
 
