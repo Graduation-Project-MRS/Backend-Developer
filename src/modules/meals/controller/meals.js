@@ -64,6 +64,35 @@ export const recommendMeal = asyncHandler(async (req, res, next) => {
     let response = await fetch(url, options);
     response = await response.json();
     for (let res of response.Recommendation) {
+            // const checkAndUploadImage = async (res) => {
+      //   try {
+      //     // Define the folder and the image name
+      //     const folder = `${process.env.FOLDER_CLOUDINARY}/recommend/${res.name}`;
+      //     const imageName = res.img_link;
+      
+      //     // Search for the image in the specified folder
+      //     const result = await cloudinary.search
+      //       .expression(`folder:${folder} AND filename:${imageName}`)
+      //       .execute();
+      
+      //     if (result.total_count > 0) {
+      //       // Image already exists
+      //       console.log('Image already exists in Cloudinary:', result.resources[0]);
+      //       res.img_link = {
+      //         url: result.resources[0].secure_url,
+      //         id: result.resources[0].public_id,
+      //       };
+      //     } else {
+      //       // Image does not exist, upload it
+      //       const { secure_url, public_id } = await cloudinary.uploader.upload(imageName, {
+      //         folder: folder,
+      //       });
+      //       res.img_link = { url: secure_url, id: public_id };
+      //     }
+      //   } catch (error) {
+      //     console.error('Error checking or uploading image to Cloudinary:', error);
+      //   }
+      // };
       const { secure_url, public_id } = await cloudinary.uploader.upload(
         res.img_link,
         {
