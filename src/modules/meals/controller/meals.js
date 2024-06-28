@@ -58,6 +58,10 @@ export const recommendMeal = asyncHandler(async (req, res, next) => {
   const url = `https://wanna-meal.onrender.com/recommend?input_ingredients_str=${ingredients}`;
   const options = {
     method: "GET",
+    headers: {
+      "X-RapidAPI-Host": "famous-quotes4.p.rapidapi.com",
+      "X-RapidAPI-Key": "your-rapidapi-key",
+    },
   };
 
   try {
@@ -94,12 +98,12 @@ export const recommendMeal = asyncHandler(async (req, res, next) => {
       //   }
       // };
       const { secure_url, public_id } = await cloudinary.uploader.upload(
-        res.img_link,
+        res.image,
         {
           folder: `${process.env.FOLDER_CLOUDINARY}/recommend`,
         }
       );
-      res.img_link = { url: secure_url, id: public_id };
+      res.image = { url: secure_url, id: public_id };
     }
     res.status(200).json(response);
   } catch (err) {
