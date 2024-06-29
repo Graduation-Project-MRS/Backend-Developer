@@ -1,12 +1,19 @@
-import Tip from '../../../DB/model/tipModel.js';
+import Tip from "../../../DB/model/tipModel.js";
 
 export const createTip = async (req, res) => {
   try {
-    const newTip = await Tip.create(req.body);
+    const { title, content } = req.body;
+    const newTip = await Tip.create({
+      title,
+      content,
+      userName: req.user.userName,
+    });
     const totalTips = await Tip.countDocuments();
-    res.status(201).json({ status: 'success', data: { totalTips,tip: newTip } });
+    res
+      .status(201)
+      .json({ status: "success", data: { totalTips, tip: newTip } });
   } catch (err) {
-    res.status(400).json({ status: 'fail', message: err.message });
+    res.status(400).json({ status: "fail", message: err.message });
   }
 };
 
@@ -22,14 +29,14 @@ export const getAllTips = async (req, res) => {
     const tips = await Tip.find().skip(skip).limit(limit);
 
     res.status(200).json({
-      status: 'success',
+      status: "success",
       currentPage: page,
       totalPages: totalPages,
       results: tips.length,
-      data: { tips }
+      data: { tips },
     });
   } catch (err) {
-    res.status(500).json({ status: 'error', message: err.message });
+    res.status(500).json({ status: "error", message: err.message });
   }
 };
 
@@ -38,12 +45,17 @@ export const deleteTip = async (req, res) => {
     const { id } = req.params;
     const deletedTip = await Tip.findByIdAndDelete(id);
     if (!deletedTip) {
-      return res.status(404).json({ message: 'Tip not found' });
+      return res.status(404).json({ message: "Tip not found" });
     }
     const totalTips = await Tip.countDocuments();
-    res.status(200).json({ status: 'success', message: 'Tip deleted successfully', deletedTip, totalTips });
+    res.status(200).json({
+      status: "success",
+      message: "Tip deleted successfully",
+      deletedTip,
+      totalTips,
+    });
   } catch (err) {
-    res.status(500).json({ status: 'error', message: err.message });
+    res.status(500).json({ status: "error", message: err.message });
   }
 };
 
@@ -52,15 +64,24 @@ export const updateTip = async (req, res) => {
     const { id } = req.params;
     const { title, content } = req.body;
 
-    const updatedTip = await Tip.findByIdAndUpdate(id, { title, content }, { new: true });
+    const updatedTip = await Tip.findByIdAndUpdate(
+      id,
+      { title, content },
+      { new: true }
+    );
 
     if (!updatedTip) {
-      return res.status(404).json({ message: 'Tip not found' });
+      return res.status(404).json({ message: "Tip not found" });
     }
 
     const totalTips = await Tip.countDocuments();
-    res.status(200).json({ status: 'success', message: 'Tip updated successfully', updatedTip, totalTips });
+    res.status(200).json({
+      status: "success",
+      message: "Tip updated successfully",
+      updatedTip,
+      totalTips,
+    });
   } catch (err) {
-    res.status(500).json({ status: 'error', message: err.message });
+    res.status(500).json({ status: "error", message: err.message });
   }
 };
