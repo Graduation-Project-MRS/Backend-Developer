@@ -1,70 +1,84 @@
 // import Joi from 'joi';
-import { check , body } from "express-validator"
-import validatorMiddleware from "../../middleware/validatorMiddleware.js"
-import slugify from "slugify"
+import { check, body, validationResult } from "express-validator";
+import validatorMiddleware from "../../middleware/validatorMiddleware.js";
+import slugify from "slugify";
 
-
-import  Category  from "../../../DB/model/categoryModel.js"
+import Category from "../../../DB/model/categoryModel.js";
 
 export const createIngredientValidator = [
-  check('name')
+  check("name")
     .notEmpty()
-    .withMessage('ingredient required')
+    .withMessage("ingredient required")
     .isLength({ min: 2 })
-    .withMessage('Too short ingredient name')
+    .withMessage("Too short ingredient name")
     .isLength({ max: 32 })
-    .withMessage('Too long ingredient name')
+    .withMessage("Too long ingredient name")
     .custom((val, { req }) => {
       req.body.slug = slugify(val);
       return true;
     }),
-    check('category')
+  check("category")
     .notEmpty()
-    .withMessage('ingredient must be belong to a category')
+    .withMessage("ingredient must be belong to a category")
     .isMongoId()
-    .withMessage('Invalid ID formate')
-    .custom((categoryId) =>//does category already in DB or not 
-      Category.findById(categoryId).then((category) => {
-        if (!category) {
-          return Promise.reject(
-            new Error(`No category for this id: ${categoryId}`)
-          );
-        }
-      })
+    .withMessage("Invalid ID formate")
+    .custom(
+      (
+        categoryId //does category already in DB or not
+      ) =>
+        Category.findById(categoryId).then((category) => {
+          if (!category) {
+            return Promise.reject(
+              new Error(`No category for this id: ${categoryId}`)
+            );
+          }
+        })
     ),
+
   validatorMiddleware,
 ];
 
+export const imgValidate = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+  next();
+};
+
 export const getIngredientValidator = [
-  check('id').isMongoId().withMessage('Invalid ID formate'),
+  check("id").isMongoId().withMessage("Invalid ID formate"),
   validatorMiddleware,
 ];
 
 export const updateIngredientValidator = [
-  check('id').isMongoId().withMessage('Invalid Ingredient id format'),
-  body('name').custom((val, { req }) => {
+  check("id").isMongoId().withMessage("Invalid Ingredient id format"),
+  body("name").custom((val, { req }) => {
     req.body.slug = slugify(val);
     return true;
   }),
-  check('category')
+  check("category")
     .notEmpty()
-    .withMessage('ingredient must be belong to a category')
+    .withMessage("ingredient must be belong to a category")
     .isMongoId()
-    .withMessage('Invalid ID formate')
-    .custom((categoryId) =>//does category already in DB or not 
-      Category.findById(categoryId).then((category) => {
-        if (!category) {
-          return Promise.reject(
-            new Error(`No category for this id: ${categoryId}`)
-          );
-        }
-      })
+    .withMessage("Invalid ID formate")
+    .custom(
+      (
+        categoryId //does category already in DB or not
+      ) =>
+        Category.findById(categoryId).then((category) => {
+          if (!category) {
+            return Promise.reject(
+              new Error(`No category for this id: ${categoryId}`)
+            );
+          }
+        })
     ),
   validatorMiddleware,
 ];
 
 export const deleteIngredientValidator = [
-  check('id').isMongoId().withMessage('Invalid ID formate'),
+  check("id").isMongoId().withMessage("Invalid ID formate"),
   validatorMiddleware,
 ];
 

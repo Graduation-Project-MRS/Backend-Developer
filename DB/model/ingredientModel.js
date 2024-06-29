@@ -12,18 +12,18 @@ const ingredientSchema = new mongoose.Schema(
     },
     slug: {
       type: String,
-      required: true,
     },
-    //   image: {
-    //     url: {
-    //       type: String,
-    //       default: "",
-    //     },
-    //     id: {
-    //       type: String,
-    //       default: "",
-    //     },
-    //   },
+      image: {
+        url: {
+          type: String,
+          required :true,
+        },
+        id: {
+          type: String,
+          required :true
+        },
+        
+      },
     quantity: {
       type: Number,
       default: 0,

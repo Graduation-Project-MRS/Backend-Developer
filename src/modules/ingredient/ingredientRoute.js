@@ -1,9 +1,11 @@
 import express from "express";
 import { allowedTo }  from "../auth/controller/auth.js"
 import auth from "../../middleware/auth.js";
+import { fileUpload, filterObject } from "../../utils/multer.js"
 
 import {
   createIngredientValidator,
+  imgValidate,
   getIngredientValidator,
   updateIngredientValidator,
   deleteIngredientValidator,
@@ -22,11 +24,14 @@ import {
 // ex: We need to access categoryId from category router
 const router = express.Router({ mergeParams: true }); //child
 
+
 router.post(
   "/addIngredient",
   auth,
   allowedTo,
+  fileUpload(filterObject.image).single("img"),
   createIngredientValidator,
+  imgValidate,
   createIngredient
 );
 router.get("/getAll", auth, createFilterObj, getIngredients);
