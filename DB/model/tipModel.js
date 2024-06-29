@@ -12,6 +12,7 @@ const tipSchema = new mongoose.Schema({
     required: true,
     min:10
   },
+  userName: String ,
   createdAt: {
     type: Date,
     default: Date.now
