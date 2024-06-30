@@ -6,6 +6,7 @@ import slugify from "slugify";
 
 import userModel from "../../../../DB/model/User.model.js";
 import { translate } from "@vitalets/google-translate-api";
+import { HttpsProxyAgent } from "https-proxy-agent";
 
 export const addAnewRecipe = asyncHandler(async (req, res, next) => {
   const {
@@ -52,11 +53,16 @@ export const addAnewRecipe = asyncHandler(async (req, res, next) => {
 const fetch = (...args) =>
   import("node-fetch").then(({ default: fetch }) => fetch(...args));
 
+
 export const recommendMeal = asyncHandler(async (req, res, next) => {
+  const agent = new HttpsProxyAgent("http://localhost:3000");
+
   let ingredients = req.body.ingredients;
   const { lang } = req.query;
   if (lang === "eng") {
-    ingredients = (await translate(ingredients, { to: "ar" })).text;
+    ingredients = (
+      await translate(ingredients, { to: "ar", fetchOptions: { agent } })
+    ).text;
   }
   console.log(ingredients);
   const url = `https://wanna-meal.onrender.com/recommend?input_ingredients_str=${ingredients}`;
@@ -80,8 +86,21 @@ export const recommendMeal = asyncHandler(async (req, res, next) => {
       );
       res.image = { url: secure_url, id: public_id };
       if (lang === "eng") {
-        res = (await translate(JSON.stringify(res), { to: "en" })).text;
-        res = JSON.parse(res);
+        res.recipeName = (
+          await translate(res.recipeName, { to: "en", fetchOptions: { agent } })
+        ).text;
+        res.typeMeals = (
+          await translate(res.typeMeals, { to: "en", fetchOptions: { agent } })
+        ).text;
+        res.ingredients = (
+          await translate(res.ingredients, {
+            to: "en",
+            fetchOptions: { agent },
+          })
+        ).text;
+        res.steps = (
+          await translate(res.steps, { to: "en", fetchOptions: { agent } })
+        ).text;
       }
     }
     res.status(200).json(response);

@@ -27,7 +27,8 @@ const initApp = (app, express) => {
   app.use(`/auth`, authRouter);
   app.use(`/meals`, mealsRouter);
   app.use(`/family`, familyRouter);
-
+  app.use(`/post`, postRouter);
+  app.use(`/message`, messageRouter);
   app.use(`/Tips` ,tipRoutes);
   app.use(`/Categories`, categoryRoute);
   app.use(`/Ingredients`, ingredientRoute);
