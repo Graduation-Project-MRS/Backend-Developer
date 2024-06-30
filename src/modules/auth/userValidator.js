@@ -96,5 +96,22 @@ export const updateLoggedUserValidator = joi
         }
         return value;
       }),
+    password: joi
+      .string()
+      .regex(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/)
+      .required(),
+    confirmPassword: joi
+      .string()
+      .regex(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/)
+      .valid(joi.ref("password"))
+      .required(),
+    size: joi.number().positive().required(),
+    path: joi.string().required(),
+    filename: joi.string().required(),
+    destination: joi.string().required(),
+    mimetype: joi.string().required(),
+    encoding: joi.string().required(),
+    originalname: joi.string().required(),
+    fieldname: joi.string().required(),
   })
   .required();
