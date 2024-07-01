@@ -5,8 +5,7 @@ import { asyncHandler } from "../../../utils/errorHandling.js";
 import slugify from "slugify";
 
 import userModel from "../../../../DB/model/User.model.js";
-import { translate } from "@vitalets/google-translate-api";
-import { HttpsProxyAgent } from "https-proxy-agent";
+import translate from "@vitalets/google-translate-api";
 
 export const addAnewRecipe = asyncHandler(async (req, res, next) => {
   const {
@@ -54,13 +53,12 @@ const fetch = (...args) =>
   import("node-fetch").then(({ default: fetch }) => fetch(...args));
 
 export const recommendMeal = asyncHandler(async (req, res, next) => {
-  const agent = new HttpsProxyAgent("http://localhost:3000");
 
   let ingredients = req.body.ingredients;
   const { lang } = req.query;
   if (lang === "eng") {
     ingredients = (
-      await translate(ingredients, { to: "ar", fetchOptions: { agent } })
+      await translate(ingredients, { to: "ar"})
     ).text;
   }
   console.log(ingredients);
@@ -84,37 +82,25 @@ export const recommendMeal = asyncHandler(async (req, res, next) => {
         }
       );
       res.image = { url: secure_url, id: public_id };
-      const meal=await mealsModel.findOne({_id:res._id});
-      if(meal){
-        res._id=meal._id
-        res.recipeName=meal.recipeName;
-        res.typeMeals=meal.typeMeals;
-        res.ingredients=meal.ingredients;
-        res.steps=meal.steps;
-        res.image=meal.image;
-        res.times=meal.times;
-        res.EnoughFor=meal.EnoughFor;
-        res.calories=meal.calories;
-        res.isSaved=meal.isSaved;
-
+      const meal = await mealsModel.findOne({ _id: res._id });
+      if (meal) {
+        res._id = meal._id;
+        res.recipeName = meal.recipeName;
+        res.typeMeals = meal.typeMeals;
+        res.ingredients = meal.ingredients;
+        res.steps = meal.steps;
+        res.image = meal.image;
+        res.times = meal.times;
+        res.EnoughFor = meal.EnoughFor;
+        res.calories = meal.calories;
+        res.isSaved = meal.isSaved;
       }
 
       if (lang === "eng") {
-        res.recipeName = (
-          await translate(res.recipeName, { to: "en", fetchOptions: { agent } })
-        ).text;
-        res.typeMeals = (
-          await translate(res.typeMeals, { to: "en", fetchOptions: { agent } })
-        ).text;
-        res.ingredients = (
-          await translate(res.ingredients, {
-            to: "en",
-            fetchOptions: { agent },
-          })
-        ).text;
-        res.steps = (
-          await translate(res.steps, { to: "en", fetchOptions: { agent } })
-        ).text;
+        res.recipeName = await translate(res.recipeName, { to: "en" }).text;
+        res.typeMeals = await translate(res.typeMeals, { to: "en" }).text;
+        res.ingredients = await translate(res.ingredients, { to: "en" }).text;
+        res.steps =await translate(res.steps, { to: "en" }).text;
       }
     }
     res.status(200).json(response);
@@ -284,7 +270,7 @@ export const isSaved = asyncHandler(async (req, res, next) => {
         folder: `${process.env.FOLDER_CLOUDINARY}/meals/${cloudFolder}`,
       }
     );
-     meal = await mealsModel.create({
+    meal = await mealsModel.create({
       _id,
       recipeName,
       typeMeals,
@@ -302,5 +288,5 @@ export const isSaved = asyncHandler(async (req, res, next) => {
     await meal.save();
   }
 
-  return res.status(200).json({ Recommendation:meal });
+  return res.status(200).json({ Recommendation: meal });
 });
