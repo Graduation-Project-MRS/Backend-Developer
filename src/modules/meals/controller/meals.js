@@ -5,7 +5,7 @@ import { asyncHandler } from "../../../utils/errorHandling.js";
 import slugify from "slugify";
 
 import userModel from "../../../../DB/model/User.model.js";
-import translate from "@vitalets/google-translate-api";
+import translate from "translate-google";
 
 export const addAnewRecipe = asyncHandler(async (req, res, next) => {
   const {
@@ -53,13 +53,11 @@ const fetch = (...args) =>
   import("node-fetch").then(({ default: fetch }) => fetch(...args));
 
 export const recommendMeal = asyncHandler(async (req, res, next) => {
-
   let ingredients = req.body.ingredients;
   const { lang } = req.query;
   if (lang === "eng") {
-    ingredients = (
-      await translate(ingredients, { to: "ar"})
-    ).text;
+    ingredients = (await translate(ingredients, { from: "auto", to: "ar" }))
+      
   }
   console.log(ingredients);
   const url = `https://wanna-meal.onrender.com/recommend?input_ingredients_str=${ingredients}`;
@@ -97,10 +95,21 @@ export const recommendMeal = asyncHandler(async (req, res, next) => {
       }
 
       if (lang === "eng") {
-        res.recipeName = await translate(res.recipeName, { to: "en" }).text;
-        res.typeMeals = await translate(res.typeMeals, { to: "en" }).text;
-        res.ingredients = await translate(res.ingredients, { to: "en" }).text;
-        res.steps =await translate(res.steps, { to: "en" }).text;
+        res.recipeName = (
+          await translate(res.recipeName, { from: "auto", to: "en" })
+        );
+        res.typeMeals = (
+          await translate(res.typeMeals, { from: "auto", to: "en" })
+        );
+        res.ingredients = (
+          await translate(res.ingredients, {
+            from: "auto",
+            to: "en",
+          })
+        );
+        res.steps = (
+          await translate(res.steps, { from: "auto", to: "en" })
+        );
       }
     }
     res.status(200).json(response);
