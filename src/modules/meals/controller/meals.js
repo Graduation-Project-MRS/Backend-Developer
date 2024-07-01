@@ -53,7 +53,6 @@ export const addAnewRecipe = asyncHandler(async (req, res, next) => {
 const fetch = (...args) =>
   import("node-fetch").then(({ default: fetch }) => fetch(...args));
 
-
 export const recommendMeal = asyncHandler(async (req, res, next) => {
   const agent = new HttpsProxyAgent("http://localhost:3000");
 
@@ -85,6 +84,21 @@ export const recommendMeal = asyncHandler(async (req, res, next) => {
         }
       );
       res.image = { url: secure_url, id: public_id };
+      const meal=await mealsModel.findOne({_id:res._id});
+      if(meal){
+        res._id=meal._id
+        res.recipeName=meal.recipeName;
+        res.typeMeals=meal.typeMeals;
+        res.ingredients=meal.ingredients;
+        res.steps=meal.steps;
+        res.image=meal.image;
+        res.times=meal.times;
+        res.EnoughFor=meal.EnoughFor;
+        res.calories=meal.calories;
+        res.isSaved=meal.isSaved;
+
+      }
+
       if (lang === "eng") {
         res.recipeName = (
           await translate(res.recipeName, { to: "en", fetchOptions: { agent } })
@@ -244,4 +258,49 @@ export const commonMeals = asyncHandler(async (req, res, next) => {
     console.error(error);
     res.status(500).json({ error: "Internal server error" });
   }
+});
+
+export const isSaved = asyncHandler(async (req, res, next) => {
+  const {
+    _id,
+    recipeName,
+    typeMeals,
+    ingredients,
+    steps,
+    calories,
+    times,
+    EnoughFor,
+  } = req.body;
+  const { id } = req.query;
+  let meal = await mealsModel.findOne({ _id: id });
+  if (meal) {
+    meal.isSaved = !meal.isSaved;
+    await meal.save();
+  } else {
+    const cloudFolder = nanoid();
+    const { secure_url, public_id } = await cloudinary.uploader.upload(
+      req.file.path,
+      {
+        folder: `${process.env.FOLDER_CLOUDINARY}/meals/${cloudFolder}`,
+      }
+    );
+     meal = await mealsModel.create({
+      _id,
+      recipeName,
+      typeMeals,
+      calories,
+      times,
+      EnoughFor,
+      image: { url: secure_url, id: public_id },
+      cloudFolder,
+      ingredients,
+      steps,
+      createdBy: req.user._id,
+      slug: slugify(req.body.recipeName),
+    });
+    meal.isSaved = true;
+    await meal.save();
+  }
+
+  return res.status(200).json({ Recommendation:meal });
 });
