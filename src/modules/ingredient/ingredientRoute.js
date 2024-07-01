@@ -34,7 +34,7 @@ router.post(
   imgValidate,
   createIngredient
 );
-router.get("/getAll", auth, createFilterObj, getIngredients);
+router.get("/getAll", createFilterObj, getIngredients);
 router.get("/getIngredient/:id", auth, allowedTo, getIngredientValidator, getIngredientById);
 router.put(
   "/updateIngredient/:id",
