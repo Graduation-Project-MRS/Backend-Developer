@@ -55,7 +55,7 @@ const fetch = (...args) =>
 export const recommendMeal = asyncHandler(async (req, res, next) => {
   let ingredients = req.body.ingredients;
   const { lang } = req.query;
-  if (lang === "eng") {
+  if (lang === "en") {
     ingredients = (await translate(ingredients, { from: "auto", to: "ar" }))
       
   }
@@ -94,7 +94,7 @@ export const recommendMeal = asyncHandler(async (req, res, next) => {
         res.isSaved = meal.isSaved;
       }
 
-      if (lang === "eng") {
+      if (lang === "en") {
         res.recipeName = (
           await translate(res.recipeName, { from: "auto", to: "en" })
         );
