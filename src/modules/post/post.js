@@ -153,3 +153,8 @@ export const getUserPosts = asyncHandler(async (req, res, next) => {
     .sort({ createdAt: -1 });
   return res.status(200).json({ success: true, posts });
 });
+
+export const getPosts = asyncHandler(async (req, res, next) => {
+  const posts = await postModel.find().sort({ createdAt: -1 });
+  return res.status(200).json({ success: true, posts });
+});

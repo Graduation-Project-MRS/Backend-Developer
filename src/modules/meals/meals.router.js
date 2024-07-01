@@ -13,6 +13,12 @@ router.post(
   validation(validators.addAnewRecipe),
   mealController.addAnewRecipe
 );
+router.post(
+  "/isSaved",
+  auth,
+  fileUpload(filterObject.image).single("image"),
+  mealController.isSaved
+);
 router.delete(
   "/deleteMeal/:mealId",
   auth,
