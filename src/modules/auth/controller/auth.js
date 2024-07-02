@@ -156,7 +156,6 @@ export const login = asyncHandler(async (req, res, next) => {
 
 export const sendForgetCode = asyncHandler(async (req, res, next) => {
   const user = await userModel.findOne({ email: req.body.email });
-
   if (!user) {
     if (req.query.lang === "en") {
       return next(new Error("Invalid email!", { cause: 400 }));
