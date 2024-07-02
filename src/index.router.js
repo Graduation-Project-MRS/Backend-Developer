@@ -33,6 +33,10 @@ const initApp = (app, express) => {
   app.use(`/Categories`, categoryRoute);
   app.use(`/Ingredients`, ingredientRoute);
   app.use(`/users`, userRoute);
+  app.use("/",(req,res,next)=>{
+    res.send("Welcome to our API")
+  
+  })
 
   app.all("*", (req, res, next) => {
     next(new ApiError(`can't find this route :${req.originalUrl} `, 400));
