@@ -6,7 +6,7 @@ import slugify from "slugify";
 
 import userModel from "../../../../DB/model/User.model.js";
 import translate from "translate-google";
-import { json } from "express";
+
 
 export const addAnewRecipe = asyncHandler(async (req, res, next) => {
   const {
@@ -67,6 +67,7 @@ export const recommendMeal = asyncHandler(async (req, res, next) => {
       "X-RapidAPI-Host": "famous-quotes4.p.rapidapi.com",
       "X-RapidAPI-Key": "your-rapidapi-key",
     },
+    timeout: 10000, 
   };
 
   try {
@@ -98,10 +99,10 @@ export const recommendMeal = asyncHandler(async (req, res, next) => {
       if (lang === "en") {
         res = await translate(JSON.stringify(res), { from: "auto", to: "en" });
         resp.push(res)
+        console.log(res);
       }
     }
     res.status(200).json(lang==="en"?resp:response);
-
   } catch (err) {
     console.log(err);
     res.status(500).json({ msg: `Internal Server Error.` });
