@@ -6,6 +6,7 @@ import slugify from "slugify";
 
 import userModel from "../../../../DB/model/User.model.js";
 import translate from "translate-google";
+import { json } from "express";
 
 export const addAnewRecipe = asyncHandler(async (req, res, next) => {
   const {
@@ -56,8 +57,7 @@ export const recommendMeal = asyncHandler(async (req, res, next) => {
   let ingredients = req.body.ingredients;
   const { lang } = req.query;
   if (lang === "en") {
-    ingredients = (await translate(ingredients, { from: "auto", to: "ar" }))
-      
+    ingredients = await translate(ingredients, { from: "auto", to: "ar" });
   }
   console.log(ingredients);
   const url = `https://wanna-meal.onrender.com/recommend?input_ingredients_str=${ingredients}`;
@@ -72,6 +72,7 @@ export const recommendMeal = asyncHandler(async (req, res, next) => {
   try {
     let response = await fetch(url, options);
     response = await response.json();
+    let resp=[];
     for (let res of response.Recommendation) {
       const { secure_url, public_id } = await cloudinary.uploader.upload(
         res.image,
@@ -95,24 +96,12 @@ export const recommendMeal = asyncHandler(async (req, res, next) => {
       }
 
       if (lang === "en") {
-        res.recipeName = (
-          await translate(res.recipeName, { from: "auto", to: "en" })
-        );
-        res.typeMeals = (
-          await translate(res.typeMeals, { from: "auto", to: "en" })
-        );
-        res.ingredients = (
-          await translate(res.ingredients, {
-            from: "auto",
-            to: "en",
-          })
-        );
-        res.steps = (
-          await translate(res.steps, { from: "auto", to: "en" })
-        );
+        res = await translate(JSON.stringify(res), { from: "auto", to: "en" });
+        resp.push(res)
       }
     }
-    res.status(200).json(response);
+    res.status(200).json(lang==="en"?resp:response);
+
   } catch (err) {
     console.log(err);
     res.status(500).json({ msg: `Internal Server Error.` });
