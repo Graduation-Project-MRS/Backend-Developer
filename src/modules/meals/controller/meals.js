@@ -59,7 +59,6 @@ export const recommendMeal = asyncHandler(async (req, res, next) => {
   if (lang === "en") {
     ingredients = await translate(ingredients, { from: "auto", to: "ar" });
   }
-  console.log(ingredients);
   const url = `https://wanna-meal.onrender.com/recommend?input_ingredients_str=${ingredients}`;
   const options = {
     method: "GET",
@@ -99,7 +98,6 @@ export const recommendMeal = asyncHandler(async (req, res, next) => {
       if (lang === "en") {
         res = await translate(JSON.stringify(res), { from: "auto", to: "en" });
         resp.push(res)
-        console.log(res);
       }
     }
     res.status(200).json(lang==="en"?resp:response);
