@@ -16,6 +16,7 @@ const app = express()
 
 // setup port and the baseUrl
 const port = process.env.PORT 
+connectDB();
 initApp(app ,express)
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))
 
