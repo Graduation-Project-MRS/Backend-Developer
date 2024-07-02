@@ -72,7 +72,6 @@ export const recommendMeal = asyncHandler(async (req, res, next) => {
   try {
     let response = await fetch(url, options);
     response = await response.json();
-    let resp=[];
     for (let res of response.Recommendation) {
       const { secure_url, public_id } = await cloudinary.uploader.upload(
         res.image,
@@ -96,11 +95,13 @@ export const recommendMeal = asyncHandler(async (req, res, next) => {
       }
 
       if (lang === "en") {
-        res = await translate(JSON.stringify(res), { from: "auto", to: "en" });
-        resp.push(res)
+        res.recipeName = await translate(res.recipeName, { from: "auto", to: "en" });
+        res.typeMeals = await translate(res.typeMeals, { from: "auto", to: "en" });
+        res.ingredients = await translate(res.ingredients, { from: "auto", to: "en"});
+        res.steps = await translate(res.steps, { from: "auto", to: "en" });
       }
     }
-    res.status(200).json(lang==="en"?resp:response);
+    res.status(200).json(response);
   } catch (err) {
     console.log(err);
     res.status(500).json({ msg: `Internal Server Error.` });
