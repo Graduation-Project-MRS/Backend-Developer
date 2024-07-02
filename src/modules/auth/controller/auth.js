@@ -11,7 +11,7 @@ import famillyModel from "../../../../DB/model/famillyMember.js";
 import mongoose from "mongoose";
 import cloudinary from "../../../utils/cloudinary.js";
 import postModel from "../../../../DB/model/post.model.js";
-import { translate } from "@vitalets/google-translate-api";
+import translate from "translate-google";
 
 export const register = asyncHandler(async (req, res, next) => {
   const { userName, email, password } = req.body;
@@ -26,7 +26,7 @@ export const register = asyncHandler(async (req, res, next) => {
     ],
   });
   if (isUser) {
-    if (req.query.lang === "eng") {
+    if (req.query.lang === "en") {
       return next(
         new Error("email or userName already registered !", { cause: 409 })
       );
@@ -52,7 +52,7 @@ export const register = asyncHandler(async (req, res, next) => {
   });
 
   const link = `https://fast-plat1.vercel.app/auth/confirmEmail/${activationCode}?lang=${
-    req.query.lang || "eng"
+    req.query.lang || "en"
   }`;
 
   const isSent = await sendEmail({
@@ -60,7 +60,7 @@ export const register = asyncHandler(async (req, res, next) => {
     subject: "Activate Account",
     html: signupTemp(link),
   });
-  if (req.query.lang === "eng") {
+  if (req.query.lang === "en") {
     return isSent
       ? res
           .status(200)
@@ -80,13 +80,13 @@ export const activationAccount = asyncHandler(async (req, res, next) => {
   );
 
   if (!user) {
-    if (req.query.lang === "eng") {
+    if (req.query.lang === "en") {
       return next(new Error("User Not Found!", { cause: 404 }));
     }
     return next(new Error("المستخدم غير موجود!", { cause: 404 }));
   }
   await famillyModel.create({ user: user._id });
-  if (req.query.lang === "eng") {
+  if (req.query.lang === "en") {
     return res
       .status(200)
       .send("Congratulation, Your Account is now activated, try to login");
@@ -101,14 +101,14 @@ export const login = asyncHandler(async (req, res, next) => {
   const user = await userModel.findOne({ email });
 
   if (!user) {
-    if (req.query.lang === "eng") {
+    if (req.query.lang === "en") {
       return next(new Error("Invalid-Email", { cause: 400 }));
     }
     return next(new Error("البريد الالكتروني غير صحيح", { cause: 400 }));
   }
 
   if (!user.isConfirmed) {
-    if (req.query.lang === "eng") {
+    if (req.query.lang === "en") {
       return next(new Error("Un activated Account", { cause: 400 }));
     }
     return next(new Error("حساب غير مفعل", { cause: 400 }));
@@ -117,7 +117,7 @@ export const login = asyncHandler(async (req, res, next) => {
   const match = bcryptjs.compareSync(password, user.password);
 
   if (!match) {
-    if (req.query.lang === "eng") {
+    if (req.query.lang === "en") {
       return next(new Error("Invalid-Password", { cause: 400 }));
     }
     return next(new Error("كلمة المرور غير صحيحة", { cause: 400 }));
@@ -144,9 +144,9 @@ export const login = asyncHandler(async (req, res, next) => {
     token,
     data: {
       userName:
-        req.query.lang === "eng"
+        req.query.lang === "en"
           ? user.userName
-          : (await translate(user.userName, { to: "ar" })).text,
+          : (await translate(user.userName, { to: "ar" })),
       profileImage: user.profileImage,
     },
   });
@@ -158,7 +158,7 @@ export const sendForgetCode = asyncHandler(async (req, res, next) => {
   const user = await userModel.findOne({ email: req.body.email });
 
   if (!user) {
-    if (req.query.lang === "eng") {
+    if (req.query.lang === "en") {
       return next(new Error("Invalid email!", { cause: 400 }));
     }
     return next(new Error("البريد الالكتروني غير صحيح", { cause: 400 }));
@@ -185,20 +185,20 @@ export const sendForgetCode = asyncHandler(async (req, res, next) => {
   return (await sendEmail({
     to: user.email,
     subject:
-      req.query.lang === "eng" ? "Reset Password" : "إعادة تعيين كلمة المرور",
+      req.query.lang === "en" ? "Reset Password" : "إعادة تعيين كلمة المرور",
     html: resetPassword(code),
   }))
 
     ? res.status(200).json({
         success: true,
         message:
-          req.query.lang === "eng"
+          req.query.lang === "en"
             ? "check you email!"
             : "تحقق من البريد الإلكتروني الخاص بك",
         token,
       })
     : next(
-        req.query.lang === "eng"
+        req.query.lang === "en"
           ? new Error("Something went wrong!", { cause: 400 })
           : new Error("حدث خطأ ما!", { cause: 400 })
       );
@@ -225,7 +225,7 @@ export const resetPasswordByCode = asyncHandler(async (req, res, next) => {
 
   return res.status(200).json({
     success: true,
-    message: req.query.lang === "eng" ? "Try to login!" : "حاول تسجيل الدخول",
+    message: req.query.lang === "en" ? "Try to login!" : "حاول تسجيل الدخول",
   });
 });
 
@@ -234,7 +234,7 @@ export const VerifyCode = asyncHandler(async (req, res, next) => {
   if (!user.forgetCode) {
 
     return next(
-      req.query.lang === "eng"
+      req.query.lang === "en"
         ? new Error("go to resend forget code", { status: 400 })
         : new Error("انتقل لإعادة إرسال كود التاكيد", { status: 400 })
     );
@@ -242,7 +242,7 @@ export const VerifyCode = asyncHandler(async (req, res, next) => {
   }
   if (user.forgetCode !== req.body.forgetCode) {
     return next(
-      req.query.lang === "eng"
+      req.query.lang === "en"
         ? new Error("Invalid code!", { status: 400 })
         : new Error("كود غير صحيح!", { status: 400 })
     );
@@ -256,7 +256,7 @@ export const VerifyCode = asyncHandler(async (req, res, next) => {
   return res.status(200).json({
     success: true,
     message:
-      req.query.lang === "eng"
+      req.query.lang === "en"
         ? "go to reset new password"
         : "انتقل لإعادة تعيين كلمة المرور",
   });
@@ -268,14 +268,14 @@ export const followUnFollowUser = asyncHandler(async (req, res, next) => {
   const currentUser = await userModel.findById(req.user._id);
   if (id.toString() === req.user._id.toString()) {
     return next(
-      req.query.lang === "eng"
+      req.query.lang === "en"
         ? new Error("You can't follow/unfollow yourself!", { cause: 400 })
         : new Error("لا يمكنك متابعة نفسك!", { cause: 400 })
     );
   }
   if (!userToModify || !currentUser) {
     return next(
-      req.query.lang === "eng"
+      req.query.lang === "en"
         ? new Error("User not found!", { cause: 404 })
         : new Error("المستخدم غير موجود!", { cause: 404 })
     );
@@ -292,7 +292,7 @@ export const followUnFollowUser = asyncHandler(async (req, res, next) => {
     return res.status(200).json({
       success: true,
       message:
-        req.query.lang === "eng"
+        req.query.lang === "en"
           ? "User unfollowed successfully!"
           : "تم إلغاء متابعة المستخدم بنجاح!",
     });
@@ -307,7 +307,7 @@ export const followUnFollowUser = asyncHandler(async (req, res, next) => {
     return res.status(200).json({
       success: true,
       message:
-        req.query.lang === "eng"
+        req.query.lang === "en"
           ? "User followed successfully!"
           : "تم متابعة المستخدم بنجاح!",
     });
@@ -319,14 +319,14 @@ export const update = asyncHandler(async (req, res, next) => {
   const userId = req.user._id;
   let user = await userModel.findById(userId);
   if (!user) {
-    if (req.query.lang === "eng") {
+    if (req.query.lang === "en") {
       return next(new Error("User not found!", { cause: 404 }));
     }
     return next(new Error("المستخدم غير موجود!", { cause: 404 }));
   }
   if (req.params.id.toString() !== userId.toString()) {
     return next(
-      req.query.lang === "eng"
+      req.query.lang === "en"
         ? new Error("You cannot update other user's profile ", { cause: 401 })
         : new Error("لا يمكنك تحديث ملف تعريف المستخدم الآخر", { cause: 401 })
     );
@@ -378,11 +378,11 @@ export const update = asyncHandler(async (req, res, next) => {
   const userUpdated = await userModel.findById(user._id).select("-password");
   return res.status(200).json({
     message:
-      req.query.lang === "eng"
+      req.query.lang === "en"
         ? "profile updated successfully!"
         : "تم تحديث الملف الشخصي بنجاح!",
     userUpdated:
-      req.query.lang === "eng"
+      req.query.lang === "en"
         ? userUpdated
         : await translate(userUpdated, { to: "ar" }),
   });
@@ -403,7 +403,7 @@ export const getProfile = asyncHandler(async (req, res, next) => {
       .select("-password -createdAt");
   }
   if (!user) {
-    if (req.query.lang === "eng") {
+    if (req.query.lang === "en") {
       return next(new Error("User not found!", { cause: 404 }));
     }
     return next(new Error("المستخدم غير موجود!", { cause: 404 }));
@@ -411,9 +411,9 @@ export const getProfile = asyncHandler(async (req, res, next) => {
   return res.status(200).json({
     success: true,
     user:
-      req.query.lang === "eng"
+      req.query.lang === "en"
         ? user
-        : (await translate(user, { to: "ar" })).text,
+        : (await translate(user, { to: "ar" })),
   });
 });
 
@@ -443,7 +443,7 @@ export const getSuggestedUsers = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     suggestedUsers:
-      req.query.lang === "eng"
+      req.query.lang === "en"
         ? suggestedUsers
         : await translate(suggestedUsers, { to: "ar" }),
   });
@@ -452,7 +452,7 @@ export const getSuggestedUsers = asyncHandler(async (req, res, next) => {
 export const freezeAccount = asyncHandler(async (req, res, next) => {
   const user = await userModel.findById(req.user._id);
   if (!user) {
-    if (req.query.lang === "eng") {
+    if (req.query.lang === "en") {
       return next(new Error("User not found!", { cause: 404 }));
     }
     return next(new Error("المستخدم غير موجود!", { cause: 404 }));
@@ -462,7 +462,7 @@ export const freezeAccount = asyncHandler(async (req, res, next) => {
   return res.status(200).json({
     success: true,
     message:
-      req.query.lang === "eng"
+      req.query.lang === "en"
         ? "Account frozen successfully!"
         : "تم تجميد الحساب بنجاح!",
   });
@@ -477,14 +477,14 @@ export const updatePremium = asyncHandler(async (req, res, next) => {
   if (!user) {
     return res
       .status(404)
-      .send(req.query.lang === "eng" ? "User not found" : "المستخدم غير موجود");
+      .send(req.query.lang === "en" ? "User not found" : "المستخدم غير موجود");
   }
 
   user.isPremium = isPremium;
   await user.save();
 
   res.send(
-    req.query.lang === "eng"
+    req.query.lang === "en"
       ? "User subscription status updated"
       : "تم تحديث حالة اشتراك المستخدم"
   );
