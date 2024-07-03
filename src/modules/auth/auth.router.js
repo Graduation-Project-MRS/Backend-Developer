@@ -13,7 +13,8 @@ import { requirePremium } from "../../middleware/Premium.js";
 // import tipValidator from '../tip/tipValidator.js';
 
 const router = Router();
-
+router.get("/followers", auth, requirePremium, userController.getFollowers);
+router.get("/following", auth, requirePremium, userController.getFollowing);
 router.get(
   "/profile/:query",
   auth,
@@ -28,7 +29,6 @@ router.get(
   requirePremium,
   userController.getSuggestedUsers
 );
-
 
 router.get(
   "/google",
@@ -121,7 +121,5 @@ router.put(
   requirePremium,
   userController.freezeAccount
 );
-
-
 
 export default router;
