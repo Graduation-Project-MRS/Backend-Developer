@@ -148,6 +148,7 @@ export const login = asyncHandler(async (req, res, next) => {
           ? user.userName
           : (await translate(user.userName, { to: "ar" })),
       profileImage: user.profileImage,
+      isPremium:user.isPremium
     },
   });
 });
