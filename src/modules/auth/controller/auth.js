@@ -124,7 +124,6 @@ export const login = asyncHandler(async (req, res, next) => {
   }
 
   const token = jwt.sign(
-
     { id: user._id, email: user.email, isPremium: user.isPremium },
 
     process.env.TOKEN_SIGNATURE
@@ -146,9 +145,9 @@ export const login = asyncHandler(async (req, res, next) => {
       userName:
         req.query.lang === "en"
           ? user.userName
-          : (await translate(user.userName, { to: "ar" })),
+          : await translate(user.userName, { to: "ar" }),
       profileImage: user.profileImage,
-      isPremium:user.isPremium
+      isPremium: user.isPremium,
     },
   });
 });
@@ -172,7 +171,6 @@ export const sendForgetCode = asyncHandler(async (req, res, next) => {
   user.forgetCode = code;
   await user.save();
   const token = jwt.sign(
-
     { id: user._id, email: user.email, isPremium: user.isPremium },
 
     process.env.TOKEN_SIGNATURE
@@ -188,7 +186,6 @@ export const sendForgetCode = asyncHandler(async (req, res, next) => {
       req.query.lang === "en" ? "Reset Password" : "إعادة تعيين كلمة المرور",
     html: resetPassword(code),
   }))
-
     ? res.status(200).json({
         success: true,
         message:
@@ -202,7 +199,6 @@ export const sendForgetCode = asyncHandler(async (req, res, next) => {
           ? new Error("Something went wrong!", { cause: 400 })
           : new Error("حدث خطأ ما!", { cause: 400 })
       );
-
 });
 
 export const resetPasswordByCode = asyncHandler(async (req, res, next) => {
@@ -232,13 +228,11 @@ export const resetPasswordByCode = asyncHandler(async (req, res, next) => {
 export const VerifyCode = asyncHandler(async (req, res, next) => {
   const user = await userModel.findOne({ email: req.user.email });
   if (!user.forgetCode) {
-
     return next(
       req.query.lang === "en"
         ? new Error("go to resend forget code", { status: 400 })
         : new Error("انتقل لإعادة إرسال كود التاكيد", { status: 400 })
     );
-
   }
   if (user.forgetCode !== req.body.forgetCode) {
     return next(
@@ -251,7 +245,6 @@ export const VerifyCode = asyncHandler(async (req, res, next) => {
     { email: req.user.email },
     { $unset: { forgetCode: 1 } }
   );
-
 
   return res.status(200).json({
     success: true,
@@ -410,10 +403,7 @@ export const getProfile = asyncHandler(async (req, res, next) => {
   }
   return res.status(200).json({
     success: true,
-    user:
-      req.query.lang === "en"
-        ? user
-        : (await translate(user, { to: "ar" })),
+    user: req.query.lang === "en" ? user : await translate(user, { to: "ar" }),
   });
 });
 
@@ -488,17 +478,40 @@ export const updatePremium = asyncHandler(async (req, res, next) => {
       ? "User subscription status updated"
       : "تم تحديث حالة اشتراك المستخدم"
   );
-
 });
 
+export const getFollowers = asyncHandler(async (req, res, next) => {
+  const user = await userModel
+    .findById(req.user._id)
+    .select("followers")
+    .populate({
+      path: 'followers',
+      model: 'User',
+      select: "-password -createdAt",
+    })
+    .pagination(req.query.page);
 
+  return res.status(200).json({ success: true, followers: user });
+});
 
+export const getFollowing = asyncHandler(async (req, res, next) => {
+  const user = await userModel
+    .findById(req.user._id)
+    .select("following")
+    .populate({
+      path: 'following',
+      model: 'User',
+      select: "-password -createdAt",
+    })
+    .pagination(req.query.page);
 
+  return res.status(200).json({ success: true, following: user });
+});
 export const allowedTo = asyncHandler(async (req, res, next) => {
   //1- access roles  2- access login user (req.user.role)
-  const userRole = req.user.role; // 
-  if (userRole !== 'admin') {
-    return res.status(403).json({ message: 'Access denied. Admins only.' });
+  const userRole = req.user.role; //
+  if (userRole !== "admin") {
+    return res.status(403).json({ message: "Access denied. Admins only." });
   }
 
   next();
