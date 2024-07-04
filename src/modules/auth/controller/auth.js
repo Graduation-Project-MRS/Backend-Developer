@@ -146,6 +146,7 @@ export const login = asyncHandler(async (req, res, next) => {
         req.query.lang === "en"
           ? user.userName
           : await translate(user.userName, { to: "ar" }),
+          userId:user._id,
       profileImage: user.profileImage,
       isPremium: user.isPremium,
     },
