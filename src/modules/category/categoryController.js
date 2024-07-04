@@ -1,6 +1,6 @@
 import asyncHandler from "express-async-handler";
 import slugify from "slugify";
-
+import translate from "translate-google";
 import Category from "../../../DB/model/categoryModel.js";
 
 export const getCategories = asyncHandler(async (req, res) => {
@@ -9,6 +9,14 @@ export const getCategories = asyncHandler(async (req, res) => {
   const skip = (page - 1) * limit;
 
   const categories = await Category.find({}).skip(skip).limit(limit);
+  if(req.query.lang==="en"){
+    categories.map(async(category)=>{
+      category.name= await translate( category.name, { from: "auto", to: "en" })
+      category.save()
+
+    })
+  }
+
   res.status(200).json({ results: categories.length, page, data: categories });
 });
 
