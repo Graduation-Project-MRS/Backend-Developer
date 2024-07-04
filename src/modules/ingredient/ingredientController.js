@@ -2,14 +2,26 @@ import asyncHandler from "express-async-handler";
 import slugify from "slugify";
 
 import Ingredient from "../../../DB/model/ingredientModel.js";
-
+import cloudinary from "../../utils/cloudinary.js";
 
 export const createIngredient = asyncHandler(async (req, res) => {
+  const { secure_url, public_id } = await cloudinary.uploader.upload(
+    req.file.path,
+    {
+      folder: `${process.env.FOLDER_CLOUDINARY}/ingredient`,
+    }
+  );
+
+  const { name, category } = req.body;
   req.body.slug = slugify(req.body.name);
-  const ingredient = await Ingredient.create(req.body);
+  const ingredient = await Ingredient.create({
+    name: name,
+    category: category,
+    image: { url: secure_url, id: public_id },
+  });
+
   res.status(201).json({ data: ingredient });
 });
-
 
 // Nested route
 // GET /api/v1/categories/:categoryId/ingedients/getAll
