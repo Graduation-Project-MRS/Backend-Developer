@@ -7,14 +7,14 @@ export const getCategories = asyncHandler(async (req, res) => {
   const page = req.query.page * 1 || 1;
   const limit = req.query.limit * 1 || 70;
   const skip = (page - 1) * limit;
-
   const categories = await Category.find({}).skip(skip).limit(limit);
-  if(req.query.lang==="en"){
-    categories.map(async(category)=>{
-      category.name= await translate( category.name, { from: "auto", to: "en" })
-      category.save()
-
-    })
+  if (req.query.lang === "en") {
+    for (let category of categories) {
+      category.name = await translate(category.name, {
+        from: "auto",
+        to: "en",
+      });
+    }
   }
 
   res.status(200).json({ results: categories.length, page, data: categories });
