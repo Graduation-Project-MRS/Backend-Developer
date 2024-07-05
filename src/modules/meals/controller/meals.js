@@ -42,7 +42,7 @@ export const addAnewRecipe = asyncHandler(async (req, res, next) => {
     ingredients: JSON.parse(ingredients),
     steps: JSON.parse(steps),
     cloudFolder,
-    createdBy: req.user._id,
+    user: req.user._id,
     image: { url: secure_url, id: public_id },
     slug: slugify(req.body.recipeName),
   });
@@ -272,7 +272,7 @@ export const isSaved = asyncHandler(async (req, res, next) => {
       cloudFolder,
       ingredients,
       steps,
-      createdBy: req.user._id,
+      user: req.user._id,
       slug: slugify(req.body.recipeName),
     });
     meal.isSaved = true;
