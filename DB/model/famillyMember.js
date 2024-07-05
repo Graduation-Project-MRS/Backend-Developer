@@ -13,13 +13,7 @@ const famillySchema = new Schema(
       min: 0,
       required: true,
     },
-    babies: {
-      type: Number,
-      default: 0,
-      min: 0,
-
-      required: true,
-    },
+   
     childeren: {
       type: Number,
       default: 0,
