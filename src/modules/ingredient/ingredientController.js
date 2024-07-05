@@ -3,6 +3,7 @@ import slugify from "slugify";
 
 import Ingredient from "../../../DB/model/ingredientModel.js";
 import cloudinary from "../../utils/cloudinary.js";
+import ingredientModelAr from "../../../DB/model/ingredientModel ar.js";
 
 export const createIngredient = asyncHandler(async (req, res) => {
   const { secure_url, public_id } = await cloudinary.uploader.upload(
@@ -37,11 +38,17 @@ export const getIngredients = asyncHandler(async (req, res) => {
   const limit = req.query.limit * 1 || 55;
   const skip = (page - 1) * limit;
 
-  const ingredient = await Ingredient.find(req.filterObj)
+  let ingredient = await Ingredient.find({})
     .skip(skip)
     .limit(limit)
     .populate({ path: "category", select: "name -_id" });
-
+  if (req.query.lang === "ar") {
+    ingredient = await ingredientModelAr
+      .find({})
+      .skip(skip)
+      .limit(limit)
+      .populate({ path: "category", select: "name -_id" });
+  }
   res.status(200).json({ results: ingredient.length, page, data: ingredient });
 });
 
