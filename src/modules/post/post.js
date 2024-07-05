@@ -138,6 +138,7 @@ export const getFeedPosts = asyncHandler(async (req, res, next) => {
   const following = user.following;
   const feedPosts = await postModel
     .find({ postedBy: { $in: following } })
+    .populate({ path: "postedBy", select: "userName email profileImage -_id" })
     .sort({ createdAt: -1 });
   return res.status(200).json({ success: true, feedPosts });
 });
@@ -155,8 +156,10 @@ export const getUserPosts = asyncHandler(async (req, res, next) => {
 });
 
 export const getPosts = asyncHandler(async (req, res, next) => {
-  const posts = await postModel.find({}).populate({path:"postedBy",
-  select:"userName email profileImage -_id"}).sort({ createdAt: -1 });
- 
+  const posts = await postModel
+    .find({})
+    .populate({ path: "postedBy", select: "userName email profileImage -_id" })
+    .sort({ createdAt: -1 });
+
   return res.status(200).json({ success: true, posts });
 });

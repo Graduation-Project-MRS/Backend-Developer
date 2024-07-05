@@ -146,7 +146,7 @@ export const login = asyncHandler(async (req, res, next) => {
         req.query.lang === "en"
           ? user.userName
           : await translate(user.userName, { to: "ar" }),
-          userId:user._id,
+      userId: user._id,
       profileImage: user.profileImage,
       isPremium: user.isPremium,
     },
@@ -415,28 +415,23 @@ export const getSuggestedUsers = asyncHandler(async (req, res, next) => {
     .findById(userId)
     .select("following");
 
-  const users = await userModel.aggregate([
-    {
-      $match: {
-        _id: { $ne: userId },
+  const users = await userModel
+    .aggregate([
+      {
+        $match: {
+          _id: { $ne: userId },
+        },
       },
-    },
-    {
-      $sample: { size: 10 },
-    },
-  ]);
+    ])
+    .pagination(req.query.page);
   const filteredUsers = users.filter(
     (user) => !usersFollowedByYou.following.includes(user._id)
   );
-  const suggestedUsers = filteredUsers.slice(0, 4);
 
-  suggestedUsers.forEach((user) => (user.password = null));
+  filteredUsers.forEach((user) => (user.password = null));
 
   res.status(200).json({
-    suggestedUsers:
-      req.query.lang === "en"
-        ? suggestedUsers
-        : await translate(suggestedUsers, { to: "ar" }),
+    suggestedUsers: filteredUsers,
   });
 });
 
@@ -486,8 +481,8 @@ export const getFollowers = asyncHandler(async (req, res, next) => {
     .findById(req.user._id)
     .select("followers")
     .populate({
-      path: 'followers',
-      model: 'User',
+      path: "followers",
+      model: "User",
       select: "-password -createdAt",
     })
     .pagination(req.query.page);
@@ -500,8 +495,8 @@ export const getFollowing = asyncHandler(async (req, res, next) => {
     .findById(req.user._id)
     .select("following")
     .populate({
-      path: 'following',
-      model: 'User',
+      path: "following",
+      model: "User",
       select: "-password -createdAt",
     })
     .pagination(req.query.page);
