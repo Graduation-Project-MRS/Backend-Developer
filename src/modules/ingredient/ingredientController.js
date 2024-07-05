@@ -60,7 +60,10 @@ export const getIngredients = asyncHandler(async (req, res) => {
     skip = undefined;
   }
 
-  const ingredientQuery = Ingredient.find(req.filterObj);
+  const ingredientQuery = await Ingredient.find({}).populate({
+    path: "category",
+    select: "name -_id",
+  });;
 
   if (skip !== undefined) {
     ingredientQuery.skip(skip);
@@ -70,8 +73,13 @@ export const getIngredients = asyncHandler(async (req, res) => {
     ingredientQuery.limit(limit);
   }
 
-  const ingredient = await ingredientQuery.populate({ path: "category", select: "name -_id" });
+  let ingredient = ingredientQuery
+  if (req.query.lang === "ar") {
+    ingredient = await ingredientModelAr
+      .find({})
 
+      .populate({ path: "category", select: "name -_id" });
+  }
 
   res.status(200).json({ results: ingredient.length, page, data: ingredient });
 });
