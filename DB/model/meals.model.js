@@ -69,7 +69,7 @@ const mealsSchema = new Schema(
 
 mealsSchema.query.pagination = function (page) {
   page = !page || page < 1 || isNaN(page) ? 1 : page;
-  const limit = 6;
+  const limit = 4;
   const skip = limit * (page - 1);
   return this.skip(skip).limit(limit);
 };
