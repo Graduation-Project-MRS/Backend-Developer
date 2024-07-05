@@ -33,26 +33,49 @@ export const createFilterObj = (req, res, next) => {
   next();
 };
 
-export const getIngredients = asyncHandler(async (req, res) => {
-  const page = req.query.page * 1 || 1;
-  const limit = req.query.limit * 1 || 55;
-  const skip = (page - 1) * limit;
+// export const getIngredients = asyncHandler(async (req, res) => {
+//   const page = req.query.page * 1 || 1;
+//   const limit = req.query.limit * 1 || 55;
+//   const skip = (page - 1) * limit;
 
-  let ingredient = await Ingredient.find({})
-    .skip(skip)
-    .limit(limit)
-    .populate({ path: "category", select: "name -_id" });
-  if (req.query.lang === "ar") {
-    ingredient = await ingredientModelAr
-      .find({})
-      .skip(skip)
-      .limit(limit)
-      .populate({ path: "category", select: "name -_id" });
+//   const ingredient = await Ingredient.find(req.filterObj)
+//     .skip(skip)
+//     .limit(limit)
+//     .populate({ path: "category", select: "name -_id" });
+
+//   res.status(200).json({ results: ingredient.length, page, data: ingredient });
+// });
+
+////////////////////////
+
+export const getIngredients = asyncHandler(async (req, res) => {
+  let page = req.query.page * 1 || 1;
+  let limit = req.query.limit * 1 || 55;
+  let skip = (page - 1) * limit;
+
+  // Check if page and limit are not provided, then set them to undefined to disable pagination
+  if (!req.query.page && !req.query.limit) {
+    page = undefined;
+    limit = undefined;
+    skip = undefined;
   }
+
+  const ingredientQuery = Ingredient.find(req.filterObj);
+
+  if (skip !== undefined) {
+    ingredientQuery.skip(skip);
+  }
+
+  if (limit !== undefined) {
+    ingredientQuery.limit(limit);
+  }
+
+  const ingredient = await ingredientQuery.populate({ path: "category", select: "name -_id" });
+
+
   res.status(200).json({ results: ingredient.length, page, data: ingredient });
 });
 
-////////////////////////
 export const getIngredientById = async (req, res) => {
   try {
     const ingredient = await Ingredient.findById(req.params.id).populate({
