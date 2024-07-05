@@ -1,5 +1,8 @@
 import joi from "joi";
 
-export const addOrDelete = joi.object({
-  kind: joi.string().valid("add", "delete").required(),
-});
+export const add = joi
+  .object({
+    childeren: joi.number().required(),
+    adults: joi.number().required(),
+  })
+  .required();

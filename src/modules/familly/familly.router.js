@@ -6,22 +6,11 @@ import * as Validators from "./familly.validation.js";
 const router = Router();
 
 router.patch(
-  "/addOrDeleteAdults",
+  "/add",
   auth,
-  validation(Validators.addOrDelete),
-  famillyController.addOrDeleteAdults
+  validation(Validators.add),
+  famillyController.add
 );
-router.patch(
-  "/addOrDeleteBabies",
-  auth,
-  validation(Validators.addOrDelete),
-  famillyController.addOrDeleteBabies
-);
-router.patch(
-  "/addOrDeleteChildren",
-  auth,
-  validation(Validators.addOrDelete),
-  famillyController.addOrDeleteChildren
-);
+
 
 export default router;

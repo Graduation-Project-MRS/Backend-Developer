@@ -15,6 +15,7 @@ const arrayParsing = (value, helper) => {
 export const recommendMeal = joi
   .object({
     ingredients: joi.string().required(),
+    lang: joi.string().valid("en", "ar"),
   })
   .required();
 export const addAnewRecipe = joi.object({

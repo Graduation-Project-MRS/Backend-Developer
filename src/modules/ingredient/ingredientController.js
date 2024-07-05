@@ -3,6 +3,7 @@ import slugify from "slugify";
 
 import Ingredient from "../../../DB/model/ingredientModel.js";
 import cloudinary from "../../utils/cloudinary.js";
+import ingredientModelAr from "../../../DB/model/ingredientModel ar.js";
 
 export const createIngredient = asyncHandler(async (req, res) => {
   const { secure_url, public_id } = await cloudinary.uploader.upload(
@@ -70,6 +71,7 @@ export const getIngredients = asyncHandler(async (req, res) => {
   }
 
   const ingredient = await ingredientQuery.populate({ path: "category", select: "name -_id" });
+
 
   res.status(200).json({ results: ingredient.length, page, data: ingredient });
 });

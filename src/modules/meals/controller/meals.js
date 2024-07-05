@@ -6,6 +6,7 @@ import slugify from "slugify";
 
 import userModel from "../../../../DB/model/User.model.js";
 
+
 export const addAnewRecipe = asyncHandler(async (req, res, next) => {
   const {
     recipeName,
@@ -41,7 +42,7 @@ export const addAnewRecipe = asyncHandler(async (req, res, next) => {
     ingredients: JSON.parse(ingredients),
     steps: JSON.parse(steps),
     cloudFolder,
-    createdBy: req.user._id,
+    user: req.user._id,
     image: { url: secure_url, id: public_id },
     slug: slugify(req.body.recipeName),
   });
@@ -51,13 +52,18 @@ export const addAnewRecipe = asyncHandler(async (req, res, next) => {
 const fetch = (...args) =>
   import("node-fetch").then(({ default: fetch }) => fetch(...args));
 
-
 export const recommendMeal = asyncHandler(async (req, res, next) => {
-  const ingredients = req.body.ingredients;
-
+  let ingredients = req.body.ingredients;
+  const { lang } = req.query;
+ 
   const url = `https://wanna-meal.onrender.com/recommend?input_ingredients_str=${ingredients}`;
   const options = {
     method: "GET",
+    headers: {
+      "X-RapidAPI-Host": "famous-quotes4.p.rapidapi.com",
+      "X-RapidAPI-Key": "your-rapidapi-key",
+    },
+    timeout: 10000, 
   };
 
   try {
@@ -65,12 +71,27 @@ export const recommendMeal = asyncHandler(async (req, res, next) => {
     response = await response.json();
     for (let res of response.Recommendation) {
       const { secure_url, public_id } = await cloudinary.uploader.upload(
-        res.img_link,
+        res.image,
         {
           folder: `${process.env.FOLDER_CLOUDINARY}/recommend`,
         }
       );
-      res.img_link = { url: secure_url, id: public_id };
+      res.image = { url: secure_url, id: public_id };
+      const meal = await mealsModel.findOne({ _id: res._id });
+      if (meal) {
+        res._id = meal._id;
+        res.recipeName = meal.recipeName;
+        res.typeMeals = meal.typeMeals;
+        res.ingredients = meal.ingredients;
+        res.steps = meal.steps;
+        res.image = meal.image;
+        res.times = meal.times;
+        res.EnoughFor = meal.EnoughFor;
+        res.calories = meal.calories;
+        res.isSaved = meal.isSaved;
+      }
+
+      
     }
     res.status(200).json(response);
   } catch (err) {
@@ -158,22 +179,105 @@ export const getUserRatting = asyncHandler(async (req, res, next) => {
 export const commonMeals = asyncHandler(async (req, res, next) => {
   const userId = req.user._id;
   try {
-    const response = await fetch(
+    let response = await fetch(
       `https://colls.onrender.com/recommend?user_id=${userId}`,
       {
         method: "Get",
       }
     );
-      
+
     if (!response.ok) {
       throw new Error(`Error! status: ${response.status}`);
     }
 
-    const data = await response.json();
+    response = await response.json();
+    for (let res of response) {
+      // const checkAndUploadImage = async (res) => {
+      //   try {
+      //     // Define the folder and the image name
+      //     const folder = `${process.env.FOLDER_CLOUDINARY}/recommend/${res.name}`;
+      //     const imageName = res.img_link;
 
-    return res.status(200).json({ success: true, commonMeals: data });
+      //     // Search for the image in the specified folder
+      //     const result = await cloudinary.search
+      //       .expression(`folder:${folder} AND filename:${imageName}`)
+      //       .execute();
+
+      //     if (result.total_count > 0) {
+      //       // Image already exists
+      //       console.log('Image already exists in Cloudinary:', result.resources[0]);
+      //       res.img_link = {
+      //         url: result.resources[0].secure_url,
+      //         id: result.resources[0].public_id,
+      //       };
+      //     } else {
+      //       // Image does not exist, upload it
+      //       const { secure_url, public_id } = await cloudinary.uploader.upload(imageName, {
+      //         folder: folder,
+      //       });
+      //       res.img_link = { url: secure_url, id: public_id };
+      //     }
+      //   } catch (error) {
+      //     console.error('Error checking or uploading image to Cloudinary:', error);
+      //   }
+      // };
+      const { secure_url, public_id } = await cloudinary.uploader.upload(
+        res.image,
+        {
+          folder: `${process.env.FOLDER_CLOUDINARY}/commonMeal`,
+        }
+      );
+      res.image = { url: secure_url, id: public_id };
+    }
+    return res.status(200).json(response);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal server error" });
   }
+});
+
+export const isSaved = asyncHandler(async (req, res, next) => {
+  const {
+    _id,
+    recipeName,
+    image,
+    typeMeals,
+    ingredients,
+    steps,
+    calories,
+    times,
+    EnoughFor,
+  } = req.body;
+  const { id } = req.query;
+  let meal = await mealsModel.findOne({ _id: id });
+  if (meal) {
+    meal.isSaved = !meal.isSaved;
+    await meal.save();
+  } else {
+    const cloudFolder = nanoid();
+    const { secure_url, public_id } = await cloudinary.uploader.upload(
+      image,
+      {
+        folder: `${process.env.FOLDER_CLOUDINARY}/meals/${cloudFolder}`,
+      }
+    );
+    meal = await mealsModel.create({
+      _id,
+      recipeName,
+      typeMeals,
+      calories,
+      times,
+      EnoughFor,
+      image: { url: secure_url, id: public_id },
+      cloudFolder,
+      ingredients,
+      steps,
+      user: req.user._id,
+      slug: slugify(req.body.recipeName),
+    });
+    meal.isSaved = true;
+    await meal.save();
+  }
+
+  return res.status(200).json({ Recommendation: meal });
 });

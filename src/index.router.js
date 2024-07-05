@@ -28,12 +28,14 @@ const initApp = (app, express) => {
   app.use(`/auth`, authRouter);
   app.use(`/meals`, mealsRouter);
   app.use(`/family`, familyRouter);
-
+  app.use(`/post`, postRouter);
+  app.use(`/message`, messageRouter);
   app.use(`/Tips` ,tipRoutes);
   app.use(`/Categories`, categoryRoute);
   app.use(`/Ingredients`, ingredientRoute);
   app.use(`/users`, userRoute);
   app.use(`/contactus`, contactRoute);
+
 
   app.all("*", (req, res, next) => {
     next(new ApiError(`can't find this route :${req.originalUrl} `, 400));

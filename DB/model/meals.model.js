@@ -8,6 +8,10 @@ const mealsSchema = new Schema(
       min: 8,
       max: 25,
     },
+    _id:{
+      type: Number,
+      required: true,
+    },
     slug: {
       type: String,
       required: true,
@@ -18,7 +22,6 @@ const mealsSchema = new Schema(
     },
     information: {
       type: String,
-      required: true,
       min: 8,
       max: 180,
     },
@@ -52,15 +55,21 @@ const mealsSchema = new Schema(
       required: true,
     },
     isSaved: { type: Boolean, default: false },
-    ingredients: [{ type: String, required: true }],
-    steps: [{ type: String, required: true }],
+    ingredients: {
+      type:String,
+      required: true,
+    },
+    steps:{
+      type:String,
+      required: true,
+    },
   },
   { timestamps: true, strictQuery: true, toJSON: { virtuals: true } }
 );
 
 mealsSchema.query.pagination = function (page) {
   page = !page || page < 1 || isNaN(page) ? 1 : page;
-  const limit = 6;
+  const limit = 4;
   const skip = limit * (page - 1);
   return this.skip(skip).limit(limit);
 };
