@@ -240,6 +240,7 @@ export const isSaved = asyncHandler(async (req, res, next) => {
   const {
     _id,
     recipeName,
+    image,
     typeMeals,
     ingredients,
     steps,
@@ -255,7 +256,7 @@ export const isSaved = asyncHandler(async (req, res, next) => {
   } else {
     const cloudFolder = nanoid();
     const { secure_url, public_id } = await cloudinary.uploader.upload(
-      req.file.path,
+      image,
       {
         folder: `${process.env.FOLDER_CLOUDINARY}/meals/${cloudFolder}`,
       }

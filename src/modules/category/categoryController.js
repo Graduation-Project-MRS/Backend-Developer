@@ -2,22 +2,20 @@ import asyncHandler from "express-async-handler";
 import slugify from "slugify";
 import translate from "translate-google";
 import Category from "../../../DB/model/categoryModel.js";
+import categoryModelAr from "../../../DB/model/categoryModel ar.js";
 
 export const getCategories = asyncHandler(async (req, res) => {
   const page = req.query.page * 1 || 1;
   const limit = req.query.limit * 1 || 70;
   const skip = (page - 1) * limit;
-  const categories = await Category.find({}).skip(skip).limit(limit);
-  if (req.query.lang === "en") {
-    for (let category of categories) {
-      category.name = await translate(category.name, {
-        from: "auto",
-        to: "en",
-      });
-    }
+  let categories = await Category.find({}).skip(skip).limit(limit);
+  if (req.query.lang === "ar") {
+    categories = await categoryModelAr.find({}).skip(skip).limit(limit);
   }
 
-  res.status(200).json({ results: categories.length, page, data: categories });
+  return res
+    .status(200)
+    .json({ results: categories.length, page, data: categories });
 });
 
 export const getCategory = asyncHandler(async (req, res, next) => {
