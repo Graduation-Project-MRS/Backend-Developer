@@ -27,6 +27,7 @@ router.delete(
 );
 router.get(
   "/recommendMeal",
+  auth,
   validation(validators.recommendMeal),
   mealController.recommendMeal
 );

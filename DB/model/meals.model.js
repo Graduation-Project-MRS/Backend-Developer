@@ -39,8 +39,7 @@ const mealsSchema = new Schema(
     cloudFolder: String,
     typeMeals: {
       type: String,
-      enum: ["Lunch", "Dinner", "Breakfast"],
-      default: "Lunch",
+      required: true,
     },
     EnoughFor: {
       type: Number,

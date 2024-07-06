@@ -36,7 +36,7 @@ const userSchema = new Schema(
       default: "user",
       required: true,
     },
-    wishlist: [Types.ObjectId],
+    wishlist: [String],
     isConfirmed: {
       type: Boolean,
       default: false,
