@@ -237,7 +237,7 @@ export const commonMeals = asyncHandler(async (req, res, next) => {
   }
 });
 
-export const isSaved = async (req, res, next) => {
+export const isSaved =asyncHandler( async (req, res, next) => {
   const {
     _id,
     recipeName,
@@ -296,4 +296,9 @@ export const isSaved = async (req, res, next) => {
   }
 
   return res.status(200).json({ Recommendation: meal });
-};
+});
+
+export const getSavedMeals =asyncHandler( async (req, res, next) => {
+  const user = await userModel.findById(req.user._id).populate("wishlist");
+  return res.status(200).json({ success: true, data: user.wishlist });
+});
