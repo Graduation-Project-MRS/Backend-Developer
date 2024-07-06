@@ -19,7 +19,7 @@ export const recommendMeal = joi
   })
   .required();
 export const addAnewRecipe = joi.object({
-  _id: joi.number().required(),
+  _id: joi.number(),
   recipeName: joi.string().min(8).max(25).required(),
   information: joi.string().required().min(8).max(180),
   typeMeals: joi.string().required(),

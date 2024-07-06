@@ -8,7 +8,6 @@ import userModel from "../../../../DB/model/User.model.js";
 
 export const addAnewRecipe = asyncHandler(async (req, res, next) => {
   const {
-    _id,
     recipeName,
     information,
     typeMeals,
@@ -32,7 +31,6 @@ export const addAnewRecipe = asyncHandler(async (req, res, next) => {
   );
 
   const meal = await mealsModel.create({
-    _id,
     recipeName,
     user: req.user._id,
     information,

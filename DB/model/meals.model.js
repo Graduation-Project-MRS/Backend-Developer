@@ -10,7 +10,6 @@ const mealsSchema = new Schema(
     },
     _id:{
       type: Number,
-      required: true,
     },
     slug: {
       type: String,
