@@ -76,23 +76,23 @@ export const recommendMeal = asyncHandler(async (req, res, next) => {
         }
       );
       res.image = { url: secure_url, id: public_id };
-      const meal = user.wishlist.find(
-        (meal) => meal.toString() === res._id.toString()
-      );
-      console.log(meal);
 
-      // if (meal) {
-      //   res._id = meal._id;
-      //   res.recipeName = meal.recipeName;
-      //   res.typeMeals = meal.typeMeals;
-      //   res.ingredients = meal.ingredients;
-      //   res.steps = meal.steps;
-      //   res.image = meal.image;
-      //   res.times = meal.times;
-      //   res.EnoughFor = meal.EnoughFor;
-      //   res.calories = meal.calories;
-      //   res.isSaved = meal.isSaved;
-      // }
+      let meal = user.wishlist.find((meal) => meal === res._id.toString());
+      const newMeal = await mealsModel.findById(meal);
+
+
+      if (newMeal) {
+        res._id = newMeal._id;
+        res.recipeName = newMeal.recipeName;
+        res.typeMeals = newMeal.typeMeals;
+        res.ingredients = newMeal.ingredients;
+        res.steps = newMeal.steps;
+        res.image = newMeal.image;
+        res.times = newMeal.times;
+        res.EnoughFor = newMeal.EnoughFor;
+        res.calories = newMeal.calories;
+        res.isSaved = newMeal.isSaved;
+      }
     }
     res.status(200).json(response);
   } catch (err) {
@@ -237,7 +237,7 @@ export const commonMeals = asyncHandler(async (req, res, next) => {
   }
 });
 
-export const isSaved =asyncHandler( async (req, res, next) => {
+export const isSaved = asyncHandler(async (req, res, next) => {
   const {
     _id,
     recipeName,
@@ -250,6 +250,11 @@ export const isSaved =asyncHandler( async (req, res, next) => {
     EnoughFor,
   } = req.body;
   const { id } = req.query;
+  if (_id.toString() !== id) {
+    return next(
+      new Error("id not match in query Url and body", { cause: 400 })
+    );
+  }
   let meal = await mealsModel.findOne({ _id: id });
   let user = await userModel.findById({
     _id: req.user._id,
@@ -258,7 +263,9 @@ export const isSaved =asyncHandler( async (req, res, next) => {
     if (meal.isSaved) {
       meal.isSaved = false;
       await meal.save();
-      user.wishlist = user.wishlist.filter((meal) => meal !== _id.toString());
+      user.wishlist = await user.wishlist.filter(
+        (meal) => meal !== _id.toString()
+      );
       console.log(user.wishlist);
       await user.save();
     } else {
@@ -298,7 +305,7 @@ export const isSaved =asyncHandler( async (req, res, next) => {
   return res.status(200).json({ Recommendation: meal });
 });
 
-export const getSavedMeals =asyncHandler( async (req, res, next) => {
+export const getSavedMeals = asyncHandler(async (req, res, next) => {
   const user = await userModel.findById(req.user._id).populate({
     path: "wishlist",
     model: "Meals",
