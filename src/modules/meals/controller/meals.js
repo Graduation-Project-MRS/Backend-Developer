@@ -6,7 +6,6 @@ import slugify from "slugify";
 
 import userModel from "../../../../DB/model/User.model.js";
 
-
 export const addAnewRecipe = asyncHandler(async (req, res, next) => {
   const {
     recipeName,
@@ -55,7 +54,7 @@ const fetch = (...args) =>
 export const recommendMeal = asyncHandler(async (req, res, next) => {
   let ingredients = req.body.ingredients;
   const { lang } = req.query;
- 
+  const user = await userModel.findById(req.user._id);
   const url = `https://wanna-meal.onrender.com/recommend?input_ingredients_str=${ingredients}`;
   const options = {
     method: "GET",
@@ -63,7 +62,7 @@ export const recommendMeal = asyncHandler(async (req, res, next) => {
       "X-RapidAPI-Host": "famous-quotes4.p.rapidapi.com",
       "X-RapidAPI-Key": "your-rapidapi-key",
     },
-    timeout: 10000, 
+    timeout: 10000,
   };
 
   try {
@@ -77,21 +76,23 @@ export const recommendMeal = asyncHandler(async (req, res, next) => {
         }
       );
       res.image = { url: secure_url, id: public_id };
-      const meal = await mealsModel.findOne({ _id: res._id });
-      if (meal) {
-        res._id = meal._id;
-        res.recipeName = meal.recipeName;
-        res.typeMeals = meal.typeMeals;
-        res.ingredients = meal.ingredients;
-        res.steps = meal.steps;
-        res.image = meal.image;
-        res.times = meal.times;
-        res.EnoughFor = meal.EnoughFor;
-        res.calories = meal.calories;
-        res.isSaved = meal.isSaved;
-      }
+      const meal = user.wishlist.find(
+        (meal) => meal.toString() === res._id.toString()
+      );
+      console.log(meal);
 
-      
+      // if (meal) {
+      //   res._id = meal._id;
+      //   res.recipeName = meal.recipeName;
+      //   res.typeMeals = meal.typeMeals;
+      //   res.ingredients = meal.ingredients;
+      //   res.steps = meal.steps;
+      //   res.image = meal.image;
+      //   res.times = meal.times;
+      //   res.EnoughFor = meal.EnoughFor;
+      //   res.calories = meal.calories;
+      //   res.isSaved = meal.isSaved;
+      // }
     }
     res.status(200).json(response);
   } catch (err) {
@@ -236,7 +237,7 @@ export const commonMeals = asyncHandler(async (req, res, next) => {
   }
 });
 
-export const isSaved = asyncHandler(async (req, res, next) => {
+export const isSaved = async (req, res, next) => {
   const {
     _id,
     recipeName,
@@ -250,17 +251,29 @@ export const isSaved = asyncHandler(async (req, res, next) => {
   } = req.body;
   const { id } = req.query;
   let meal = await mealsModel.findOne({ _id: id });
+  let user = await userModel.findById({
+    _id: req.user._id,
+  });
   if (meal) {
-    meal.isSaved = !meal.isSaved;
-    await meal.save();
+    if (meal.isSaved) {
+      meal.isSaved = false;
+      await meal.save();
+      user.wishlist = user.wishlist.filter((meal) => meal !== _id.toString());
+      console.log(user.wishlist);
+      await user.save();
+    } else {
+      meal.isSaved = true;
+      await meal.save();
+      if (!user.wishlist.find((meal) => meal === _id)) {
+        user.wishlist.push(_id);
+        await user.save();
+      }
+    }
   } else {
     const cloudFolder = nanoid();
-    const { secure_url, public_id } = await cloudinary.uploader.upload(
-      image,
-      {
-        folder: `${process.env.FOLDER_CLOUDINARY}/meals/${cloudFolder}`,
-      }
-    );
+    const { secure_url, public_id } = await cloudinary.uploader.upload(image, {
+      folder: `${process.env.FOLDER_CLOUDINARY}/meals/${cloudFolder}`,
+    });
     meal = await mealsModel.create({
       _id,
       recipeName,
@@ -275,9 +288,12 @@ export const isSaved = asyncHandler(async (req, res, next) => {
       user: req.user._id,
       slug: slugify(req.body.recipeName),
     });
+
+    user.wishlist.push(_id);
+    await user.save();
     meal.isSaved = true;
     await meal.save();
   }
 
   return res.status(200).json({ Recommendation: meal });
-});
+};

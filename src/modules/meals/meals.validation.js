@@ -21,9 +21,9 @@ export const recommendMeal = joi
 export const addAnewRecipe = joi.object({
   recipeName: joi.string().min(8).max(25).required(),
   information: joi.string().required().min(8).max(180),
-  typeMeals: joi.string().valid("Lunch", "Dinner", "Breakfast").required(),
-  ingredients: joi.string().custom(arrayParsing),
-  steps: joi.string().custom(arrayParsing),
+  typeMeals: joi.string().required(),
+  ingredients: joi.string(),
+  steps: joi.string(),
   times: joi.number().min(1).required(),
   calories: joi.number().min(1).required(),
   EnoughFor: joi.number().min(1).required(),
