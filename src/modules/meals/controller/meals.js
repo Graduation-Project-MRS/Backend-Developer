@@ -299,6 +299,9 @@ export const isSaved =asyncHandler( async (req, res, next) => {
 });
 
 export const getSavedMeals =asyncHandler( async (req, res, next) => {
-  const user = await userModel.findById(req.user._id).populate("wishlist");
+  const user = await userModel.findById(req.user._id).populate({
+    path: "wishlist",
+    model: "meals",
+  });
   return res.status(200).json({ success: true, data: user.wishlist });
 });
