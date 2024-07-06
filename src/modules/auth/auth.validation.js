@@ -99,6 +99,7 @@ export const getProfile = joi
 export const lang = joi
   .object({
     lang: joi.string().valid("en", "ar").required(),
+    page:joi.number()
   })
   .required();
 export const updatePremium = joi

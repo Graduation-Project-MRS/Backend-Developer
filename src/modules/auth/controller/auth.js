@@ -410,20 +410,29 @@ export const getProfile = asyncHandler(async (req, res, next) => {
 
 export const getSuggestedUsers = asyncHandler(async (req, res, next) => {
   const userId = req.user._id;
+  const itemsPerPage = 4; // Define items per page
+const page = parseInt(req.query.page) || 1; // Get current page from request query, default to 1
+
 
   const usersFollowedByYou = await userModel
     .findById(userId)
     .select("following");
 
-  const users = await userModel
-    .aggregate([
-      {
-        $match: {
-          _id: { $ne: userId },
-        },
+  const users = await userModel.aggregate([
+    {
+      $match: {
+        _id: { $ne: userId },
       },
-    ])
-    .pagination(req.query.page);
+    },
+    {
+      $skip: (page - 1) * itemsPerPage // Pagination: Skip items from previous pages
+    },
+    {
+      $limit: itemsPerPage // Pagination: Limit to items per page
+    }
+    
+  ]);
+
   const filteredUsers = users.filter(
     (user) => !usersFollowedByYou.following.includes(user._id)
   );
